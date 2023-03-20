@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         const val NO_OPERATION = 0
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                 else -> 0
             }
 
-            result.text = finalResult.toString()
+            result.text = finalResult.toString().removeSuffix(".0")
         }
 
 
