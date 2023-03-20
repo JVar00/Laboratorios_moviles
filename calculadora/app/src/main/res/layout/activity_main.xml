@@ -361,7 +361,7 @@
         android:layout_marginBottom="5dp"
         android:fontFamily="sans-serif"
         android:gravity="bottom|center|end"
-        android:text="20.000"
+        android:text="0"
         android:textColor="@color/white"
         android:textSize="60sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"

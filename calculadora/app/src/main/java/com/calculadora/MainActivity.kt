@@ -31,9 +31,22 @@ class MainActivity : AppCompatActivity() {
     lateinit var multiply : Button
     lateinit var divide : Button
     lateinit var clear : Button
+    lateinit var submit : Button
 
     //Result
     lateinit var result : TextView
+
+    //Global Values
+    private var firstNumber : Double = 0.0
+    private var secondNumber : Double = 0.0
+    private var operation : Int = 0
+    companion object{
+        const val SUMA = 1
+        const val RESTA = 2
+        const val MULTIPLICACION = 3
+        const val DIVISION = 4
+        const val NO_OPERATION = 0
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,11 +72,49 @@ class MainActivity : AppCompatActivity() {
         divide = this.findViewById(R.id.DivideButton)
         multiply = this.findViewById(R.id.MultiplyButton)
         clear = this.findViewById(R.id.ClearButton)
+        submit = this.findViewById(R.id.SubmitButton)
 
         //Result
         result = this.findViewById(R.id.Result)
 
         //Listeners
+        number0.setOnClickListener() { onNumberSelected("0") }
+        number1.setOnClickListener() { onNumberSelected("1") }
+        number2.setOnClickListener() { onNumberSelected("2") }
+        number3.setOnClickListener() { onNumberSelected("3") }
+        number4.setOnClickListener() { onNumberSelected("4") }
+        number5.setOnClickListener() { onNumberSelected("5") }
+        number6.setOnClickListener() { onNumberSelected("6") }
+        number7.setOnClickListener() { onNumberSelected("7") }
+        number8.setOnClickListener() { onNumberSelected("8") }
+        number9.setOnClickListener() { onNumberSelected("9") }
+        decimal.setOnClickListener() { onNumberSelected(".") }
+
+        addition.setOnClickListener() { onOperationSelected(SUMA) }
+        substract.setOnClickListener() { onOperationSelected(RESTA) }
+        multiply.setOnClickListener() { onOperationSelected(MULTIPLICACION) }
+        divide.setOnClickListener() { onOperationSelected(DIVISION) }
+
+        clear.setOnClickListener() {
+            firstNumber = 0.0
+            secondNumber = 0.0
+            operation = NO_OPERATION
+            result.text = "0"
+        }
+
+        submit.setOnClickListener() {
+
+            var finalResult = when (operation) {
+                SUMA -> firstNumber + secondNumber
+                RESTA -> firstNumber - secondNumber
+                MULTIPLICACION -> firstNumber * secondNumber
+                DIVISION -> firstNumber / secondNumber
+                else -> 0
+            }
+
+            result.text = finalResult.toString()
+        }
+
 
          /*
         text = this.findViewById(R.id.textView1)
@@ -73,6 +124,28 @@ class MainActivity : AppCompatActivity() {
         boton.setOnClickListener{
             text.setText("hola")
         }*/
+    }
+
+    private fun onNumberSelected(number: String){
+        when (result.text){
+            "0" -> result.text = "$number"
+            else -> result.text = "${result.text}$number"
+        }
+
+
+        if (operation == NO_OPERATION){
+            firstNumber = result.text.toString().toDouble()
+        } else {
+            secondNumber = result.text.toString().toDouble()
+        }
+    }
+
+    private fun onOperationSelected(operation: Int){
+
+        this.operation = operation
+        firstNumber = result.text.toString().toDouble()
+        result.text = "0"
+
     }
 
     //se sobreescribe el metodo para poder utilizar el menu en la pantalla
