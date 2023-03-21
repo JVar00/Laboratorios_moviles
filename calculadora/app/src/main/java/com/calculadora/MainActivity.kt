@@ -9,6 +9,9 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import kotlin.system.exitProcess
+import org.mariuszgromada.math.mxparser.Expression
+import kotlin.math.exp
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var substract : Button
     lateinit var multiply : Button
     lateinit var divide : Button
+    lateinit var percentage : Button
+    lateinit var changeSign : Button
     lateinit var clear : Button
     lateinit var submit : Button
 
@@ -37,14 +42,17 @@ class MainActivity : AppCompatActivity() {
     lateinit var result : TextView
 
     //Global Values
-    private var firstNumber : Double = 0.0
-    private var secondNumber : Double = 0.0
+    private var expression : String = ""
+    private var number : Double = 0.0
     private var operation : Int = 0
+
     companion object{
         const val SUMA = 1
         const val RESTA = 2
         const val MULTIPLICACION = 3
         const val DIVISION = 4
+        const val PERCENTAGE = 5
+        const val CHANGESIGN = 6
         const val NO_OPERATION = 0
     }
 
@@ -70,6 +78,8 @@ class MainActivity : AppCompatActivity() {
         substract = this.findViewById(R.id.SubstractButton)
         divide = this.findViewById(R.id.DivideButton)
         multiply = this.findViewById(R.id.MultiplyButton)
+        percentage = this.findViewById(R.id.percentageButton)
+        changeSign = this.findViewById(R.id.positiveNegative)
         clear = this.findViewById(R.id.ClearButton)
         submit = this.findViewById(R.id.SubmitButton)
 
@@ -93,56 +103,59 @@ class MainActivity : AppCompatActivity() {
         substract.setOnClickListener() { onOperationSelected(RESTA) }
         multiply.setOnClickListener() { onOperationSelected(MULTIPLICACION) }
         divide.setOnClickListener() { onOperationSelected(DIVISION) }
+        percentage.setOnClickListener() { onOperationSelected(PERCENTAGE) }
+        changeSign.setOnClickListener() { onOperationSelected(CHANGESIGN) }
 
         clear.setOnClickListener() {
-            firstNumber = 0.0
-            secondNumber = 0.0
+            expression = ""
+            number = 0.0
             operation = NO_OPERATION
             result.text = "0"
         }
 
         submit.setOnClickListener() {
 
-            var finalResult = when (operation) {
-                SUMA -> firstNumber + secondNumber
-                RESTA -> firstNumber - secondNumber
-                MULTIPLICACION -> firstNumber * secondNumber
-                DIVISION -> firstNumber / secondNumber
-                else -> 0
-            }
+            expression = "$expression$number"
 
-            result.text = finalResult.toString().removeSuffix(".0")
+            result.text = Expression(expression).calculate().toString().removeSuffix(".0")
+            number = result.text.toString().toDouble()
+            expression = ""
+
         }
 
-
-         /*
-        text = this.findViewById(R.id.textView1)
-        boton = this.findViewById(R.id.button1) //instancia del boton
-
-        //accion del boton
-        boton.setOnClickListener{
-            text.setText("hola")
-        }*/
     }
 
-    private fun onNumberSelected(number: String){
+    private fun onNumberSelected(new_number: String){
+
         when (result.text){
-            "0" -> result.text = "$number"
-            else -> result.text = "${result.text}$number"
+            "0" -> result.text = "$new_number"
+            else -> result.text = "${result.text}$new_number"
         }
 
+        number = result.text.toString().toDouble()
 
-        if (operation == NO_OPERATION){
-            firstNumber = result.text.toString().toDouble()
-        } else {
-            secondNumber = result.text.toString().toDouble()
-        }
     }
 
     private fun onOperationSelected(operation: Int){
 
         this.operation = operation
-        firstNumber = result.text.toString().toDouble()
+
+        if (operation == CHANGESIGN){
+            number *= -1
+            result.text = number.toString().removeSuffix(".0")
+            return
+        }
+
+        expression = "$expression$number${when (operation) {
+            SUMA -> "+"
+            RESTA -> "-"
+            MULTIPLICACION -> "*"
+            DIVISION -> "/"
+            PERCENTAGE -> "%"
+            else -> ""
+        }}"
+
+        number = 0.0
         result.text = "0"
 
     }
