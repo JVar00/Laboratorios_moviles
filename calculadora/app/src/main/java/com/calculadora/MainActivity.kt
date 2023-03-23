@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         number7.setOnClickListener() { onNumberSelected("7") }
         number8.setOnClickListener() { onNumberSelected("8") }
         number9.setOnClickListener() { onNumberSelected("9") }
-        decimal.setOnClickListener() { onNumberSelected(".") }
+        decimal.setOnClickListener() { onDecimalSelected() }
 
         addition.setOnClickListener() { onOperationSelected(SUMA) }
         substract.setOnClickListener() { onOperationSelected(RESTA) }
@@ -115,8 +115,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         submit.setOnClickListener() {
+            if (operation != PERCENTAGE){
+                expression = "$expression$number"
+            }
 
-            expression = "$expression$number"
 
             result.text = Expression(expression).calculate().toString().removeSuffix(".0")
             Log.d("expression", Expression(expression).calculate().toString())
@@ -138,6 +140,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         number = result.text.toString().toDouble()
+
+    }
+
+    private fun onDecimalSelected(){
+
+        if (!result.text.contains(".")){
+            result.text = "${result.text}."
+        }
 
     }
 

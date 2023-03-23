@@ -202,8 +202,6 @@ class Avanzada : AppCompatActivity() {
             }
         }
 
-
-
         Log.d("Expression", expression)
 
     }
