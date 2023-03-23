@@ -202,6 +202,9 @@ class Avanzada : AppCompatActivity() {
             }
         }
 
+        number = 0.0
+        result.text = "0"
+
         Log.d("Expression", expression)
 
     }
@@ -212,12 +215,13 @@ class Avanzada : AppCompatActivity() {
 
         expression = "${when (operation) {
             ROT -> "sqrt("
-            EXPONENTIAL -> "exp("
             SEN -> "sin("
+            EXPONENTIAL -> "exp("
             COS -> "cos("
             TAN -> "tan("
             else -> ""
-        }}$number$expression)"
+        }}$expression$number)"
+
 
         Log.d("Expression", expression)
 
