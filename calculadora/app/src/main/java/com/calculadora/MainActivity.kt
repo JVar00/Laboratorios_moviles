@@ -183,6 +183,11 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.avanzada -> {
+                var intent = Intent(this, Avanzada::class.java)
+                startActivity(intent)
+                true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
