@@ -3,6 +3,7 @@ package com.calculadora
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -118,8 +119,12 @@ class MainActivity : AppCompatActivity() {
             expression = "$expression$number"
 
             result.text = Expression(expression).calculate().toString().removeSuffix(".0")
+            Log.d("expression", Expression(expression).calculate().toString())
+
             number = result.text.toString().toDouble()
             expression = ""
+
+
 
         }
 
@@ -128,7 +133,7 @@ class MainActivity : AppCompatActivity() {
     private fun onNumberSelected(new_number: String){
 
         when (result.text){
-            "0" -> result.text = "$new_number"
+            "0" -> result.text = new_number
             else -> result.text = "${result.text}$new_number"
         }
 
