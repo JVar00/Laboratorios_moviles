@@ -3,6 +3,7 @@ package com.calculadora
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -10,7 +11,6 @@ import android.widget.Button
 import android.widget.TextView
 import kotlin.system.exitProcess
 import org.mariuszgromada.math.mxparser.Expression
-import kotlin.math.exp
 
 class Avanzada : AppCompatActivity() {
     //Numbers
@@ -112,28 +112,30 @@ class Avanzada : AppCompatActivity() {
         num9.setOnClickListener() { onNumberSelected("9") }
         dec.setOnClickListener() { onNumberSelected(".") }
 
-        addition.setOnClickListener() { onOperationSelected(Avanzada.SUMA) }
-        substract.setOnClickListener() { onOperationSelected(Avanzada.RESTA) }
-        multiply.setOnClickListener() { onOperationSelected(Avanzada.MULTIPLICACION) }
-        divide.setOnClickListener() { onOperationSelected(Avanzada.DIVISION) }
-        root.setOnClickListener() { onOperationSelected(Avanzada.ROT) }
-        exp.setOnClickListener() { onOperationSelected(Avanzada.EXPONENTIAL) }
-        sen.setOnClickListener() { onOperationSelected(Avanzada.SEN) }
-        cos.setOnClickListener() { onOperationSelected(Avanzada.COS) }
-        tan.setOnClickListener() { onOperationSelected(Avanzada.TAN) }
-        p1.setOnClickListener() { onOperationSelected(Avanzada.P1) }
-        p2.setOnClickListener() { onOperationSelected(Avanzada.P2) }
+        addition.setOnClickListener() { onOperationSelected(SUMA) }
+        substract.setOnClickListener() { onOperationSelected(RESTA) }
+        multiply.setOnClickListener() { onOperationSelected(MULTIPLICACION) }
+        divide.setOnClickListener() { onOperationSelected(DIVISION) }
+        root.setOnClickListener() { onAdvancedSelected(ROT) }
+        exp.setOnClickListener() { onAdvancedSelected(EXPONENTIAL) }
+        sen.setOnClickListener() { onAdvancedSelected(SEN) }
+        cos.setOnClickListener() { onAdvancedSelected(COS) }
+        tan.setOnClickListener() { onAdvancedSelected(TAN) }
+        p1.setOnClickListener() { onParenthesisSelected(P1) }
+        p2.setOnClickListener() { onParenthesisSelected(P2) }
 
         clear.setOnClickListener() {
             expression = ""
             number = 0.0
-            operation = Avanzada.NO_OPERATION
+            operation = NO_OPERATION
             result.text = "0"
         }
 
         submit.setOnClickListener() {
 
-            expression = "$expression$number"
+            if (operation != P2){
+                expression = "$expression$number"
+            }
 
             result.text = Expression(expression).calculate().toString().removeSuffix(".0")
             number = result.text.toString().toDouble()
@@ -145,7 +147,7 @@ class Avanzada : AppCompatActivity() {
     private fun onNumberSelected(new_number: String){
 
         when (result.text){
-            "0" -> result.text = "$new_number"
+            "0" -> result.text = new_number
             else -> result.text = "${result.text}$new_number"
         }
 
@@ -157,24 +159,73 @@ class Avanzada : AppCompatActivity() {
 
         this.operation = operation
 
-        expression = "$expression$number${when (operation) {
-            SUMA -> "+"
-            RESTA -> "-"
-            MULTIPLICACION -> "*"
-            DIVISION -> "/"
+        if (number != 0.0){
+            expression = "$expression$number${when (operation) {
+                SUMA -> "+"
+                RESTA -> "-"
+                MULTIPLICACION -> "*"
+                DIVISION -> "/"
+                else -> ""
+            }}"
+        }else{
+            expression = "$expression${when (operation) {
+                SUMA -> "+"
+                RESTA -> "-"
+                MULTIPLICACION -> "*"
+                DIVISION -> "/"
+                else -> ""
+            }}"
+        }
+
+        Log.d("Expression", expression)
+
+        number = 0.0
+        result.text = "0"
+
+    }
+
+    private fun onParenthesisSelected(operation: Int){
+
+        this.operation = operation
+
+        if (number != 0.0){
+            expression = when (operation) {
+                P1 -> "($number$expression"
+                P2 -> "$expression$number)"
+                else -> ""
+            }
+        }else{
+            expression = when (operation) {
+                P1 -> "($expression"
+                P2 -> "$expression)"
+                else -> ""
+            }
+        }
+
+
+
+        Log.d("Expression", expression)
+
+    }
+
+    private fun onAdvancedSelected(operation: Int){
+
+        this.operation = operation
+
+        expression = "${when (operation) {
             ROT -> "sqrt("
             EXPONENTIAL -> "exp("
             SEN -> "sin("
             COS -> "cos("
             TAN -> "tan("
-            P1 -> "("
-            P2 -> ")"
             else -> ""
-        }}"
+        }}$number$expression)"
 
+        Log.d("Expression", expression)
 
-        number = 0.0
-        result.text = "0"
+        result.text = Expression(expression).calculate().toString()
+        number = result.text.toString().toDouble()
+        expression = ""
 
     }
 
