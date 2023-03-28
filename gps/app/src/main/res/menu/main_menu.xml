@@ -6,9 +6,15 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu_item_home"
-            tools:icon="@drawable/ic_launcher_background"
+            tools:icon="@android:drawable/ic_menu_home"
             android:title="@string/menu_item_home"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="ifRoom"/>
+        <item
+            android:id="@+id/menu_item_maps"
+            tools:icon="@android:drawable/ic_menu_mapmode"
+            android:title="@string/menu_item_maps"
+            app:showAsAction="ifRoom"
+            />
     </group>
 
 </menu>
