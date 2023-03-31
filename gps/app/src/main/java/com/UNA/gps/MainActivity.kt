@@ -26,6 +26,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawableLayout.addDrawerListener(toggle)
         toggle.syncState()
 
+        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
+        navigationView.setNavigationItemSelectedListener(this)
+
     }
 
     override fun onBackPressed() {
@@ -37,16 +40,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-when(item.itemId){
+        lateinit var fragment: androidx.fragment.app.Fragment
+        when(item.itemId){
             R.id.menu_item_home -> {
-                Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show()
-                //supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment()).commit()
+                fragment = HomeFragment()
             }
             R.id.menu_item_maps -> {
-                Toast.makeText(this, "Maps", Toast.LENGTH_SHORT).show()
-                //supportFragmentManager.beginTransaction().replace(R.id.fragment_container, MapsFragment()).commit()
+                fragment = MapsFragment()
             }
         }
+
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
         drawableLayout.closeDrawer(GravityCompat.START)
         return true
     }
