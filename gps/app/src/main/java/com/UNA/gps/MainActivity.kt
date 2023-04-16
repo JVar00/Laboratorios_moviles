@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.conf -> {
                 fragment = ConfigFragment()
+                fragment.arguments = messageBundle
             }
         }
         supportFragmentManager.beginTransaction()

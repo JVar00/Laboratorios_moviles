@@ -20,6 +20,13 @@ class ConfigFragment : Fragment() {
     ///val message
     private var message: String? = "Mi marcador por default"
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            message = it.getString("message")
+        }
+    }
+
     interface OnMessageSendListener {
         fun onMessageSent(message: String)
     }
