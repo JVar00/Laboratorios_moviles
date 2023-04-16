@@ -4,54 +4,64 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    lateinit var drawableLayout: DrawerLayout
+    lateinit var drawerLayout: DrawerLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        var toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-
-        //assign toolbar to main
+        var toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        drawableLayout = findViewById(R.id.drawerlayout)
-        var toggle = androidx.appcompat.app.ActionBarDrawerToggle(
-            this, drawableLayout, toolbar, R.string.open, R.string.close)
-        drawableLayout.addDrawerListener(toggle)
-        toggle.syncState()
+        drawerLayout = findViewById(R.id.drawerlayout)
 
+        var toogle = ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.drawer_open,
+            R.string.drawer_close
+        )
+        drawerLayout.addDrawerListener(toogle)
+        toogle.syncState()
         val navigationView = findViewById<NavigationView>(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
     }
 
     override fun onBackPressed() {
-        if(drawableLayout.isDrawerOpen(GravityCompat.START)){
-            drawableLayout.closeDrawer(GravityCompat.START)
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START)
         }else{
             super.onBackPressed()
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        lateinit var fragment: androidx.fragment.app.Fragment
-        when(item.itemId){
-            R.id.menu_item_home -> {
-                fragment = HomeFragment()
+        lateinit var fragment : Fragment
+        when (item.itemId){
+            R.id.home -> {
+                //DIALOGO
+                //fragment = HomeFragment.newInstance("string1","string2")
             }
-            R.id.menu_item_maps -> {
+            R.id.maps -> {
                 fragment = MapsFragment()
             }
+            R.id.conf -> {
+                fragment = ConfigFragment()
+            }
         }
-
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit()
-        drawableLayout.closeDrawer(GravityCompat.START)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.home_content, fragment)
+            .commit()
+        drawerLayout.closeDrawer(GravityCompat.START)
+        //cuando seleccionamos el menu maps, se carga un fragmento con el contenido MapsFragment
         return true
     }
 

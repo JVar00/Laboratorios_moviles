@@ -2,8 +2,9 @@
     <string name="app_name">GPS</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="menu_item_home">Home</string>
-    <string name="menu_item_maps">Maps</string>
-    <string name="open">Open</string>
-    <string name="close">Close</string>
+    <string name="nav_home">Acerca De</string>
+    <string name="nav_maps">Mapas</string>
+    <string name="drawer_open">Abrir Menu</string>
+    <string name="drawer_close">Cerrar Menu</string>
+    <string name="nav_conf">Configuracion</string>
 </resources>
