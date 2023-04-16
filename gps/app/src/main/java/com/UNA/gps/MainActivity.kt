@@ -1,11 +1,13 @@
 package com.UNA.gps
 
+import android.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -46,6 +48,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    fun showDialog() {
+        val builder = AlertDialog.Builder(this) // Reemplaza 'requireContext()' con la referencia al contexto del Fragment
+        builder.setTitle("Integrantes")
+        builder.setMessage("Jeff Vargas Barrantes y Caleb Sanchez Solorzano")
+        builder.setPositiveButton("Cerrar") { dialog, which ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         lateinit var fragment : Fragment
 
@@ -59,8 +71,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         when (item.itemId){
             R.id.home -> {
-                //DIALOGO
-                //fragment = HomeFragment.newInstance("string1","string2")
+                showDialog()
+                return true
             }
             R.id.maps -> {
                 fragment = MapsFragment()
