@@ -21,11 +21,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 
 import android.util.Log
+import android.widget.Button
 
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.GoogleApiClient
 
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.CameraPosition
 
 class MapsFragment : Fragment() {
 
@@ -97,8 +100,50 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val view = inflater.inflate(R.layout.fragment_maps, container, false)
+        val refreshButton = view.findViewById<Button>(R.id.refreshButton)
 
-        return inflater.inflate(R.layout.fragment_maps, container, false)
+        // Set an OnClickListener to handle the button click event
+        refreshButton.setOnClickListener {
+            // Call a method to update the user's location and add a new marker
+            updateLocationAndMarker()
+        }
+        return view
+    }
+
+    private fun updateLocationAndMarker() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            // Get the user's current location
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                // Check if the location is not null
+                location?.let {
+                    // Update the map camera to the new location
+                    val cameraPosition = CameraPosition.Builder()
+                        .target(LatLng(location.latitude, location.longitude))
+                        .zoom(15f)
+                        .build()
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+
+                    // Add a new marker at the new location
+                    val markerOptions = MarkerOptions()
+                        .position(LatLng(location.latitude, location.longitude))
+                        .title(param1)
+                    googleMap.addMarker(markerOptions)
+                }
+            }
+        } else {
+            // Request location permissions if not granted
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
