@@ -7,4 +7,5 @@
     <string name="drawer_open">Abrir Menu</string>
     <string name="drawer_close">Cerrar Menu</string>
     <string name="nav_conf">Configuracion</string>
+    <string name="nuevo_texto_de_marcador">Nuevo texto de marcador</string>
 </resources>

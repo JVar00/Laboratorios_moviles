@@ -11,8 +11,11 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, ConfigFragment.OnMessageSendListener {
     lateinit var drawerLayout: DrawerLayout
+    lateinit var messageDefault : String
+    lateinit var messageBundle : Bundle
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,6 +48,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         lateinit var fragment : Fragment
+
+        //if messageBundle is empty then set default message
+        if(!::messageBundle.isInitialized){
+            messageDefault = "Mi marcador por default"
+            val bundle = Bundle()
+            bundle.putString("message", messageDefault)
+            messageBundle = bundle
+        }
+
         when (item.itemId){
             R.id.home -> {
                 //DIALOGO
@@ -52,6 +64,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.maps -> {
                 fragment = MapsFragment()
+                fragment.arguments = messageBundle
             }
             R.id.conf -> {
                 fragment = ConfigFragment()
@@ -63,6 +76,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.closeDrawer(GravityCompat.START)
         //cuando seleccionamos el menu maps, se carga un fragmento con el contenido MapsFragment
         return true
+    }
+
+    override fun onMessageSent(message: String) {
+        val bundle = Bundle()
+        bundle.putString("message", message)
+        messageBundle = bundle
     }
 
 }

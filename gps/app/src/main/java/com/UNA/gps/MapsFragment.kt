@@ -27,8 +27,16 @@ import com.google.android.gms.common.api.GoogleApiClient
 
 import com.google.android.gms.location.LocationServices
 
-
 class MapsFragment : Fragment() {
+
+    private var param1: String? = "Marcado default por maps"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString("message")
+        }
+    }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
@@ -68,7 +76,7 @@ class MapsFragment : Fragment() {
                     lastLocation = location
                     val currentLatLng = LatLng(location.latitude, location.longitude)
                     googleMap.addMarker(
-                        MarkerOptions().position(currentLatLng).title("Marker in Current Location")
+                        MarkerOptions().position(currentLatLng).title(param1)
                     )
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 } else {
@@ -76,7 +84,7 @@ class MapsFragment : Fragment() {
                     //miami location
                     val currentLatLng = LatLng(25.7617, -80.1918)
                     googleMap.addMarker(
-                        MarkerOptions().position(currentLatLng).title("Marker in Current Location")
+                        MarkerOptions().position(currentLatLng).title(param1)
                     )
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 }
@@ -135,7 +143,7 @@ class MapsFragment : Fragment() {
                         val currentLatLng = LatLng(location.latitude, location.longitude)
                         googleMap.addMarker(
                             MarkerOptions().position(currentLatLng)
-                                .title("Marker in Current Location")
+                                .title(param1)
                         )
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                     }
