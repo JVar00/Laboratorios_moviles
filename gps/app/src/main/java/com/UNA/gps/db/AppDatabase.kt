@@ -5,12 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.UNA.gps.MapsFragment
 
 import com.UNA.gps.dao.LocationDAO
-import com.UNA.gps.entity.Location
+import com.UNA.gps.entity.LocationEntity
 import com.UNA.gps.converter.Converters
 
-@Database(entities = [Location::class], version = 1)
+@Database(entities = [LocationEntity::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDAO

@@ -29,16 +29,28 @@ import com.google.android.gms.common.api.GoogleApiClient
 
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.*
+
+import androidx.lifecycle.lifecycleScope
+import com.UNA.gps.dao.LocationDAO
+import com.UNA.gps.db.AppDatabase
+import com.UNA.gps.entity.LocationEntity
+import kotlinx.coroutines.launch
+
 
 class MapsFragment : Fragment() {
 
     private var param1: String? = "Marcado default por maps"
+    private lateinit var locationDao: LocationDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString("message")
         }
+        locationDao = AppDatabase.getInstance(requireContext()).locationDao()
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -46,6 +58,14 @@ class MapsFragment : Fragment() {
     private val REQUEST_LOCATION_PERMISSION = 1
     private lateinit var googleMap: GoogleMap
     private var mGoogleApiClient: GoogleApiClient? = null
+
+    private fun insertEntity(entity: LocationEntity) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                locationDao.insert(entity)
+            }
+        }
+    }
 
     @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
@@ -75,15 +95,22 @@ class MapsFragment : Fragment() {
             googleMap.isMyLocationEnabled = true
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
-                    Log.d("MapsFragment", "Location is not null")
+                    Log.d("MapsFragment", "LocationEntity is not null")
                     lastLocation = location
+                    val entity = LocationEntity(
+                        id = null,
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        date = Date()
+                    )
+                    insertEntity(entity)
                     val currentLatLng = LatLng(location.latitude, location.longitude)
                     googleMap.addMarker(
                         MarkerOptions().position(currentLatLng).title(param1)
                     )
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 } else {
-                    Log.d("MapsFragment", "Location is null")
+                    Log.d("MapsFragment", "LocationEntity is null")
                     //miami location
                     val currentLatLng = LatLng(25.7617, -80.1918)
                     googleMap.addMarker(
@@ -122,6 +149,13 @@ class MapsFragment : Fragment() {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 // Check if the location is not null
                 location?.let {
+                    val entity = LocationEntity(
+                        id = null,
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        date = Date()
+                    )
+                    insertEntity(entity)
                     // Update the map camera to the new location
                     val cameraPosition = CameraPosition.Builder()
                         .target(LatLng(location.latitude, location.longitude))
@@ -186,6 +220,13 @@ class MapsFragment : Fragment() {
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     if (location != null) {
                         lastLocation = location
+                        val entity = LocationEntity(
+                            id = null,
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            date = Date()
+                        )
+                        insertEntity(entity)
                         val currentLatLng = LatLng(location.latitude, location.longitude)
                         googleMap.addMarker(
                             MarkerOptions().position(currentLatLng)
