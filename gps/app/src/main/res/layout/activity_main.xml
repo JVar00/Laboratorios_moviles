@@ -9,10 +9,10 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/home_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -26,7 +26,8 @@
         android:fitsSystemWindows="true"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_head"
-        app:menu="@menu/main_menu"/>
+        app:menu="@menu/main_menu"
+        />
 
 
 </androidx.drawerlayout.widget.DrawerLayout>
