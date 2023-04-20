@@ -29,6 +29,7 @@ import android.widget.Button
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import com.google.android.gms.common.api.GoogleApiClient
 
 import com.google.android.gms.location.LocationServices
@@ -119,17 +120,8 @@ class MapsFragment : Fragment() {
             )
         } else {
             googleMap.isMyLocationEnabled = true
-            val locations = locationDao.getAll()
 
-            // Agrega un marcador para cada ubicación.
-            if (locations != null) {
-                for (location in locations) {
-                    val latLng = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                    googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
-                }
-            }
-
-
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 if (location != null) {
                     Log.d("MapsFragment", "LocationEntity is not null")
@@ -168,6 +160,29 @@ class MapsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
         val refreshButton = view.findViewById<Button>(R.id.refreshButton)
+
+        val database = AppDatabase.getInstance(requireContext())
+        locationDao = database.locationDao()
+
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync { map ->
+            googleMap = map
+        }
+
+        /*
+        locationDao.getAll().observe(viewLifecycleOwner, { locations ->
+            // Configura el mapa.
+            val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+            mapFragment.getMapAsync { googleMap ->
+                // Agrega un marcador para cada ubicación.
+                if (locations != null) {
+                    for (location in locations) {
+                        val latLng = LatLng(location.latitude, location.longitude)
+                        googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
+                    }
+                }
+            }
+        })*/
 
         // Set an OnClickListener to handle the button click event
         refreshButton.setOnClickListener {
@@ -230,73 +245,76 @@ class MapsFragment : Fragment() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val latitude = intent?.getDoubleExtra("latitude", 0.0) ?: 0.0
                 val longitude = intent?.getDoubleExtra("longitude", 0.0) ?: 0.0
-                val entity = LocationEntity(
-                    id = null,
-                    latitude = latitude,
-                    longitude = longitude,
-                    date = Date()
-                )
-                //insertEntity(entity)
-                val cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(latitude, longitude))
-                    .zoom(15f)
-                    .build()
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-
-                // Add a new marker at the new location
-                val markerOptions = MarkerOptions()
-                    .position(LatLng(latitude, longitude))
-                    .title(param1)
-                googleMap.addMarker(markerOptions)
-                println(latitude.toString() + " " + longitude)
+                Log.d("IM HERE NOW", latitude.toString() + "    " + longitude)
+                println(latitude.toString() + "    " + longitude)
             }
         }
         context?.registerReceiver(locationReceiver, IntentFilter("ubicacionActualizada"))
-
     }
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    if (requestCode == 1) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                iniciaServicio()
+            }
+        } else {
+            // Permiso denegado, maneja la situación de acuerdo a tus necesidades
+            Log.d("MapsFragment", "LocationEntity is null")
+            //miami location
+            val currentLatLng = LatLng(25.7617, -80.1918)
+            googleMap.addMarker(
+                MarkerOptions().position(currentLatLng).title(param1)
+            )
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+        }
+    }
+}
 
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.checkSelfPermission(
-                        this.requireContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        this.requireContext(),
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    return
-                }
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        lastLocation = location
-                        val entity = LocationEntity(
-                            id = null,
-                            latitude = location.latitude,
-                            longitude = location.longitude,
-                            date = Date()
-                        )
-                        insertEntity(entity)
-                        val currentLatLng = LatLng(location.latitude, location.longitude)
-                        googleMap.addMarker(
-                            MarkerOptions().position(currentLatLng)
-                                .title(param1)
-                        )
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-                    }
+/*
+override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+    val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+    mapFragment?.getMapAsync(callback)
+
+    if (requestCode == REQUEST_LOCATION_PERMISSION) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                    this.requireContext(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this.requireContext(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    lastLocation = location
+                    val entity = LocationEntity(
+                        id = null,
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        date = Date()
+                    )
+                    insertEntity(entity)
+                    val currentLatLng = LatLng(location.latitude, location.longitude)
+                    googleMap.addMarker(
+                        MarkerOptions().position(currentLatLng)
+                            .title(param1)
+                    )
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 }
             }
         }
     }
+}*/
 }
