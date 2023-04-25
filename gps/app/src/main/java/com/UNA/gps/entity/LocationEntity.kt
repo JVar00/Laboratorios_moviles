@@ -8,5 +8,6 @@ import java.util.*
 data class LocationEntity (@PrimaryKey(autoGenerate = true) val id: Long?,
                            val latitude: Double,
                            val date: Date,
-                           val longitude: Double,)
+                           val longitude: Double,
+                           var itsInside: Boolean,)
 

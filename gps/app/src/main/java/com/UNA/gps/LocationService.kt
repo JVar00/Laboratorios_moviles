@@ -39,14 +39,6 @@ class LocationService : Service() {
 
         locationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
-                val ubicacion = LocationEntity(
-                    id = null,
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    date = Date()
-                )
-                saveLocationToDatabase(ubicacion)
-
                 val intent = Intent(LOCATION_UPDATE_ACTION)
                 intent.putExtra("latitud", location.latitude)
                 intent.putExtra("longitud", location.longitude)
@@ -69,12 +61,6 @@ class LocationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun saveLocationToDatabase(ubicacion: LocationEntity) {
-        coroutineScope.launch {
-            val ubicacionDao = AppDatabase.getInstance(applicationContext).locationDao()
-            ubicacionDao.insert(ubicacion)
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
