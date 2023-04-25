@@ -88,6 +88,7 @@ class MapsFragment : Fragment() {
                 googleMap.addMarker(
                     MarkerOptions().position(location).title(param1)
                 )
+                /*
                 val cameraPosition = CameraPosition.Builder()
                     .target(LatLng(location.latitude, location.longitude))
                     .zoom(15f)
@@ -96,7 +97,7 @@ class MapsFragment : Fragment() {
                     CameraUpdateFactory.newCameraPosition(
                         cameraPosition
                     )
-                )
+                )*/
                 if (isLocationInsidePolygon(location)){
                     entity.itsInside = true
                 }
@@ -148,12 +149,6 @@ class MapsFragment : Fragment() {
 
         polygon = createPolygon()
 
-        val intent = Intent(context, LocationService::class.java)
-        context?.startService(intent)
-
-        initLocationReceiver()
-        context?.registerReceiver(locationReceiver, IntentFilter("ubicacionActualizada"))
-
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -180,7 +175,6 @@ class MapsFragment : Fragment() {
                         date = Date(),
                         itsInside = false
                     )
-
                     val currentLatLng = LatLng(location.latitude, location.longitude)
                     googleMap.addMarker(
                         MarkerOptions().position(currentLatLng).title(param1)
@@ -241,8 +235,6 @@ class MapsFragment : Fragment() {
                     googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
 
                 }
-
-
             }
         }
 
@@ -311,15 +303,21 @@ class MapsFragment : Fragment() {
 
         locationDao = AppDatabase.getInstance(requireContext()).locationDao()
 
-        //val locationServiceIntent = Intent(requireContext(), LocationService::class.java)
-        //requireContext().startService(locationServiceIntent)
-
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(this.requireContext())
 
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+
+        val locationServiceIntent = Intent(requireContext(), LocationService::class.java)
+        requireContext().startService(locationServiceIntent)
+
+        //val intent = Intent(context, LocationService::class.java)
+        //context?.startService(intent)
+
+        initLocationReceiver()
+        context?.registerReceiver(locationReceiver, IntentFilter("ubicacionActualizada"))
 
 
     }
@@ -340,6 +338,7 @@ class MapsFragment : Fragment() {
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
+                    Log.d("MapsFragment", "Permission Granted!")
                     //val intent = Intent(context, LocationService::class.java)
                     //context?.startService(intent)
                 }
