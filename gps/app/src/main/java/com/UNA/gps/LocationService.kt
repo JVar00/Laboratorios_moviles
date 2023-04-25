@@ -11,13 +11,27 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
-import androidx.core.app.ActivityCompat
-import kotlin.system.exitProcess
+import androidx.core.content.ContextCompat
+import com.UNA.gps.db.AppDatabase
+import com.UNA.gps.entity.LocationEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.*
 
 class LocationService : Service() {
 
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    companion object {
+        const val LOCATION_UPDATE_ACTION = "ubicacionActualizada"
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -25,36 +39,45 @@ class LocationService : Service() {
 
         locationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
-                // Enviar la ubicación a través de un broadcast
-                val intent = Intent("ubicacionActualizada")
-                intent.putExtra("latitude", location.latitude)
-                intent.putExtra("longitude", location.longitude)
+                val ubicacion = LocationEntity(
+                    id = null,
+                    latitude = location.latitude,
+                    longitude = location.longitude,
+                    date = Date()
+                )
+                saveLocationToDatabase(ubicacion)
+
+                val intent = Intent(LOCATION_UPDATE_ACTION)
+                intent.putExtra("latitud", location.latitude)
+                intent.putExtra("longitud", location.longitude)
                 sendBroadcast(intent)
             }
+
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
         }
     }
 
-
+    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Comenzar a recibir actualizaciones de ubicación cada 10 segundos
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return super.onStartCommand(intent, flags, startId)
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0f, locationListener)
-        return super.onStartCommand(intent, flags, startId)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0f, locationListener)
+        } else {
+            // Manejar la falta de permisos aquí, si es necesario
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun saveLocationToDatabase(ubicacion: LocationEntity) {
+        coroutineScope.launch {
+            val ubicacionDao = AppDatabase.getInstance(applicationContext).locationDao()
+            ubicacionDao.insert(ubicacion)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Detener la actualización de la ubicación al destruir el servicio
         locationManager.removeUpdates(locationListener)
     }
-
-    override fun onBind(intent: Intent?) = null
-
-
-
 }
