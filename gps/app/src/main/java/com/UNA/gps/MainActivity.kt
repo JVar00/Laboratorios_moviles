@@ -82,6 +82,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = ConfigFragment()
                 fragment.arguments = messageBundle
             }
+            R.id.polygon -> {
+                fragment = PolygonFragment()
+            }
         }
         supportFragmentManager.beginTransaction()
             .replace(R.id.home_content, fragment)

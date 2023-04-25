@@ -8,13 +8,16 @@ import androidx.room.TypeConverters
 import com.UNA.gps.MapsFragment
 
 import com.UNA.gps.dao.LocationDAO
+import com.UNA.gps.dao.PolygonDAO
 import com.UNA.gps.entity.LocationEntity
 import com.UNA.gps.converter.Converters
+import com.UNA.gps.entity.PolygonEntity
 
-@Database(entities = [LocationEntity::class], version = 1)
+@Database(entities = [LocationEntity::class, PolygonEntity::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDAO
+    abstract fun polygonDao(): PolygonDAO
 
     companion object {
         private var instance: AppDatabase? = null

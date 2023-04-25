@@ -15,5 +15,10 @@
             android:title="@string/nav_conf"
             android:icon="@android:drawable/ic_menu_mapmode"
             />
+        <item
+            android:id="@+id/polygon"
+            android:title="@string/nav_polygon"
+            android:icon="@android:drawable/ic_menu_mapmode"
+            />
     </group>
 </menu>
