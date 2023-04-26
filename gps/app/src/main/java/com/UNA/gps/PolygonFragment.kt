@@ -116,10 +116,7 @@ class PolygonFragment : Fragment() {
             } as MutableList<PolygonEntity>
             polygonList.clear()
             polygonList.addAll(polygons)
-            withContext(Dispatchers.Main) {
-                polygonAdapter.submitList(polygonList)
-            }
-            //polygonAdapter.submitList(polygonList)
+            polygonAdapter.submitList(polygonList)
         }
     }
 }

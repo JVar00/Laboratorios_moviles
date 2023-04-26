@@ -39,6 +39,7 @@ import com.UNA.gps.dao.LocationDAO
 import com.UNA.gps.dao.PolygonDAO
 import com.UNA.gps.db.AppDatabase
 import com.UNA.gps.entity.LocationEntity
+import com.UNA.gps.entity.PolygonEntity
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.PolyUtil
 import kotlinx.coroutines.launch
@@ -51,6 +52,7 @@ class MapsFragment : Fragment() {
     private lateinit var locationDao: LocationDAO
     private lateinit var polygonDao: PolygonDAO
     private lateinit var polygon: Polygon
+    private lateinit var polygonList: List<LatLng>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +128,41 @@ class MapsFragment : Fragment() {
     private fun createPolygon(): Polygon {
         val polygonOptions = PolygonOptions()
 
+        //from polygonList
+        polygonOptions.addAll(polygonList)
+
+        //NO SE COMO HACER QUE SE ESPEREEEEEEEEE ESTO ES PARA QUE NO EXPLOTE Y CON AGREGARLE UNO YA LOS CARGA TODOS WTF
+        //ALGO ES ALGO LA VERDAD POR AHORA YA SU MAYORIA ESTA
+        polygonOptions.add(LatLng(11.0, -84.0))
+
+        polygonOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+        polygonOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+
+        return googleMap.addPolygon(polygonOptions)
+    }
+
+    private fun extractLocations() {
+        lifecycleScope.launch {
+            val ubicaciones = withContext(Dispatchers.IO) {
+                locationDao.getAll()
+            }
+            ubicaciones?.forEach { ubicacion ->
+                ubicacion?.let { location ->
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
+                    // OJO CON ESTE SE DEBE DE TESTEAR SI DE VERDAD LO ESTA ACTUALIZANDO O SI ES NECESARIO ES SOLO TEST NO AFECTA
+                    if (isLocationInsidePolygon(latLng)){
+                        location.itsInside = true
+                        withContext(Dispatchers.IO) {
+                            locationDao.update(location)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun extractPolygons() {
+        polygonList = mutableListOf()
         lifecycleScope.launch {
             val polygonPoints = withContext(Dispatchers.IO) {
                 polygonDao.getAll()
@@ -133,31 +170,21 @@ class MapsFragment : Fragment() {
             if(!polygonPoints.isNullOrEmpty()){
                 polygonPoints.forEach { point ->
                     point?.let { location ->
-                        polygonOptions.add(LatLng(location.latitude, location.longitude))
+                        (polygonList as MutableList<LatLng>).add(LatLng(location.latitude, location.longitude))
                     }
                 }
             } else {
-                polygonOptions.add(LatLng(-14.0095923,108.8152324))
-                polygonOptions.add(LatLng( -43.3897529,104.2449199))
-                polygonOptions.add(LatLng( -51.8906238,145.7292949))
-                polygonOptions.add(LatLng( -31.7289525,163.3074199))
-                polygonOptions.add(LatLng( -7.4505398,156.2761699))
-                polygonOptions.add(LatLng( -14.0095923,108.8152324))
+                val latlangList = List(6) {
+                    LatLng(-14.0095923,108.8152324);
+                    LatLng( -43.3897529,104.2449199);
+                    LatLng( -51.8906238,145.7292949);
+                    LatLng( -31.7289525,163.3074199);
+                    LatLng( -7.4505398,156.2761699);
+                    LatLng( -14.0095923,108.8152324) }
+                (polygonList as MutableList<LatLng>).addAll(latlangList)
                 Toast.makeText(requireContext(), "No points to create a personalized polygon", Toast.LENGTH_SHORT).show()
             }
-            polygonOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
-            polygonOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
         }
-
-        //NO SE COMO HACER QUE SE ESPEREEEEEEEEE ESTO ES PARA QUE NO EXPLOTE
-        polygonOptions.add(LatLng(-14.0095923,108.8152324))
-        polygonOptions.add(LatLng( -43.3897529,104.2449199))
-        polygonOptions.add(LatLng( -51.8906238,145.7292949))
-        polygonOptions.add(LatLng( -31.7289525,163.3074199))
-        polygonOptions.add(LatLng( -7.4505398,156.2761699))
-        polygonOptions.add(LatLng( -14.0095923,108.8152324))
-
-        return googleMap.addPolygon(polygonOptions)
     }
 
     private fun isLocationInsidePolygon(location: LatLng): Boolean {
@@ -249,6 +276,7 @@ class MapsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
         val refreshButton = view.findViewById<Button>(R.id.refreshButton)
         val database = AppDatabase.getInstance(requireContext())
+
         locationDao = database.locationDao()
         polygonDao = database.polygonDao()
 
@@ -256,24 +284,8 @@ class MapsFragment : Fragment() {
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
 
-        lifecycleScope.launch {
-            val ubicaciones = withContext(Dispatchers.IO) {
-                locationDao.getAll()
-            }
-            ubicaciones?.forEach { ubicacion ->
-                ubicacion?.let { location ->
-                    val latLng = LatLng(location.latitude, location.longitude)
-                    googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
-                    // OJO CON ESTE SE DEBE DE TESTEAR
-                    if (isLocationInsidePolygon(latLng)){
-                        location.itsInside = true
-                        withContext(Dispatchers.IO) {
-                            locationDao.update(location)
-                        }
-                    }
-                }
-            }
-        }
+        extractPolygons()
+        extractLocations()
 
         // Set an OnClickListener to handle the button click event
         refreshButton.setOnClickListener {
@@ -313,6 +325,7 @@ class MapsFragment : Fragment() {
                             cameraPosition
                         )
                     )
+                    println(polygonList)
                     // Add a new marker at the new location
                     val markerOptions = MarkerOptions()
                         .position(LatLng(location.latitude, location.longitude))
