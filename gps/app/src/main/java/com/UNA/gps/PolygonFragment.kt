@@ -20,6 +20,8 @@ import com.google.android.gms.maps.model.Polygon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 
 class PolygonFragment : Fragment() {
 
@@ -34,12 +36,7 @@ class PolygonFragment : Fragment() {
             withContext(Dispatchers.IO) {
                 polygonDao.insert(entity)
             }
-            val polygons = withContext(Dispatchers.IO) {
-                polygonDao.getAll()
-            } as MutableList<PolygonEntity>
-            polygonList.clear()
-            polygonList.addAll(polygons)
-            polygonAdapter.submitList(polygonList)
+            updatePoints()
         }
     }
 
@@ -62,29 +59,22 @@ class PolygonFragment : Fragment() {
         polygonList = mutableListOf()
 
         // Retrieve polygons from DAO
-        lifecycleScope.launch {
-            val polygons = withContext(Dispatchers.IO) {
-                polygonDao.getAll()
-            } as MutableList<PolygonEntity>
-            polygonList.clear()
-            polygonList.addAll(polygons)
-            polygonAdapter.submitList(polygonList)
-        }
+        updatePoints()
 
         // Set up button to add a new polygon
         val addButton = view.findViewById<Button>(R.id.addButton)
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_point, null, false)
-        val latitudeEditText = dialogView.findViewById<EditText>(R.id.latitudeEditText)
-        val longitudeEditText = dialogView.findViewById<EditText>(R.id.longitudeEditText)
 
         addButton.setOnClickListener {
             // Create a dialog to prompt the user to enter the point's latitude and longitude
-            val dialog = AlertDialog.Builder(requireContext())
+            val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_point, null, false)
+            val latitudeEditText = dialogView.findViewById<EditText>(R.id.latitudeEditText)
+            val longitudeEditText = dialogView.findViewById<EditText>(R.id.longitudeEditText)
+
+            val builder = AlertDialog.Builder(requireContext())
                 .setTitle("Add Point")
                 .setView(dialogView)
                 .setPositiveButton("Add") { dialog, _ ->
                     // Get the latitude and longitude entered by the user
-
                     val latitude = latitudeEditText.text.toString().toDoubleOrNull()
                     val longitude = longitudeEditText.text.toString().toDoubleOrNull()
 
@@ -103,7 +93,7 @@ class PolygonFragment : Fragment() {
                 }
                 .create()
 
-            dialog.show()
+            builder.show()
         }
 
         return view
@@ -111,15 +101,25 @@ class PolygonFragment : Fragment() {
 
     private fun deletePoint(point: PolygonEntity) {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
+            val deleteDeferred = lifecycleScope.async(Dispatchers.IO) {
                 polygonDao.deletePoint(point)
             }
+            deleteDeferred.await()
+            updatePoints()
+        }
+    }
+
+    private fun updatePoints() {
+        lifecycleScope.launch {
             val polygons = withContext(Dispatchers.IO) {
                 polygonDao.getAll()
             } as MutableList<PolygonEntity>
             polygonList.clear()
             polygonList.addAll(polygons)
-            polygonAdapter.submitList(polygonList)
+            withContext(Dispatchers.Main) {
+                polygonAdapter.submitList(polygonList)
+            }
+            //polygonAdapter.submitList(polygonList)
         }
     }
 }

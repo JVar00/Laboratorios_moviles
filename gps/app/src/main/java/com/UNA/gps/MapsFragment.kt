@@ -22,6 +22,7 @@ import android.os.IBinder
 
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -35,6 +36,7 @@ import java.util.*
 
 import androidx.lifecycle.lifecycleScope
 import com.UNA.gps.dao.LocationDAO
+import com.UNA.gps.dao.PolygonDAO
 import com.UNA.gps.db.AppDatabase
 import com.UNA.gps.entity.LocationEntity
 import com.google.android.gms.maps.model.*
@@ -47,6 +49,7 @@ class MapsFragment : Fragment() {
     private lateinit var locationReceiver: BroadcastReceiver
     private var param1: String? = "Marcador default por maps"
     private lateinit var locationDao: LocationDAO
+    private lateinit var polygonDao: PolygonDAO
     private lateinit var polygon: Polygon
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +58,7 @@ class MapsFragment : Fragment() {
             param1 = it.getString("message")
         }
         locationDao = AppDatabase.getInstance(requireContext()).locationDao()
+        polygonDao = AppDatabase.getInstance(requireContext()).polygonDao()
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -121,14 +125,41 @@ class MapsFragment : Fragment() {
 
     private fun createPolygon(): Polygon {
         val polygonOptions = PolygonOptions()
+
+        lifecycleScope.launch {
+            val polygonPoints = withContext(Dispatchers.IO) {
+                polygonDao.getAll()
+            }
+            if(!polygonPoints.isNullOrEmpty()){
+                polygonPoints.forEach { point ->
+                    point?.let { location ->
+                        polygonOptions.add(LatLng(location.latitude, location.longitude))
+                    }
+                }
+            } else {
+                polygonOptions.add(LatLng(-14.0095923,108.8152324))
+                polygonOptions.add(LatLng( -43.3897529,104.2449199))
+                polygonOptions.add(LatLng( -51.8906238,145.7292949))
+                polygonOptions.add(LatLng( -31.7289525,163.3074199))
+                polygonOptions.add(LatLng( -7.4505398,156.2761699))
+                polygonOptions.add(LatLng( -14.0095923,108.8152324))
+                Toast.makeText(requireContext(), "No points to create a personalized polygon", Toast.LENGTH_SHORT).show()
+            }
+            polygonOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+            polygonOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+        }
+
+        //NO SE COMO HACER QUE SE ESPEREEEEEEEEE ESTO ES PARA QUE NO EXPLOTE
         polygonOptions.add(LatLng(-14.0095923,108.8152324))
         polygonOptions.add(LatLng( -43.3897529,104.2449199))
         polygonOptions.add(LatLng( -51.8906238,145.7292949))
         polygonOptions.add(LatLng( -31.7289525,163.3074199))
         polygonOptions.add(LatLng( -7.4505398,156.2761699))
         polygonOptions.add(LatLng( -14.0095923,108.8152324))
+
         return googleMap.addPolygon(polygonOptions)
     }
+
     private fun isLocationInsidePolygon(location: LatLng): Boolean {
         return polygon != null && PolyUtil.containsLocation(location, polygon?.points, true)
     }
@@ -219,12 +250,12 @@ class MapsFragment : Fragment() {
         val refreshButton = view.findViewById<Button>(R.id.refreshButton)
         val database = AppDatabase.getInstance(requireContext())
         locationDao = database.locationDao()
+        polygonDao = database.polygonDao()
 
         val mapFragment =
-            childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync { map ->
-            googleMap = map
-        }
+            childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment?.getMapAsync(callback)
+
         lifecycleScope.launch {
             val ubicaciones = withContext(Dispatchers.IO) {
                 locationDao.getAll()
@@ -233,7 +264,13 @@ class MapsFragment : Fragment() {
                 ubicacion?.let { location ->
                     val latLng = LatLng(location.latitude, location.longitude)
                     googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
-
+                    // OJO CON ESTE SE DEBE DE TESTEAR
+                    if (isLocationInsidePolygon(latLng)){
+                        location.itsInside = true
+                        withContext(Dispatchers.IO) {
+                            locationDao.update(location)
+                        }
+                    }
                 }
             }
         }
@@ -302,6 +339,7 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         locationDao = AppDatabase.getInstance(requireContext()).locationDao()
+        polygonDao = AppDatabase.getInstance(requireContext()).polygonDao()
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(this.requireContext())
@@ -312,9 +350,6 @@ class MapsFragment : Fragment() {
 
         val locationServiceIntent = Intent(requireContext(), LocationService::class.java)
         requireContext().startService(locationServiceIntent)
-
-        //val intent = Intent(context, LocationService::class.java)
-        //context?.startService(intent)
 
         initLocationReceiver()
         context?.registerReceiver(locationReceiver, IntentFilter("ubicacionActualizada"))

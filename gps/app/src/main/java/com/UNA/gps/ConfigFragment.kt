@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -54,6 +55,7 @@ class ConfigFragment : Fragment() {
         messageEditText.setText(message)
 
         sendButton.setOnClickListener {
+            Toast.makeText(requireContext(), "Se cambio exitosamente el nombre del marcador!", Toast.LENGTH_SHORT).show()
             val message = messageEditText.text.toString()
             listener?.onMessageSent(message)
         }
