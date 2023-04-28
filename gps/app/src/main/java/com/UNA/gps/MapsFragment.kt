@@ -102,6 +102,11 @@ class MapsFragment : Fragment() {
                         cameraPosition
                     )
                 )*/
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        locationDao.insert(entity)
+                    }
+                }
                 if (isLocationInsidePolygon(location)){
                     googleMap.addMarker(
                     MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
@@ -128,25 +133,6 @@ class MapsFragment : Fragment() {
         super.onPause()
         // Desregistrar el receptor al pausar el fragmento
         context?.unregisterReceiver(locationReceiver)
-    }
-
-    private fun createPolygon(): Polygon {
-        val polygonOptions = PolygonOptions()
-
-        polygonList.forEach { point ->
-            point?.let { location ->
-                println(location)
-                polygonOptions.add(location)
-            }
-        }
-
-        //NO SE COMO HACER QUE SE ESPEREEEEEEEEE ESTO ES PARA QUE NO EXPLOTE Y CON AGREGARLE UNO YA LOS CARGA TODOS WTF
-        //ALGO ES ALGO LA VERDAD POR AHORA YA SU MAYORIA ESTA
-        polygonOptions.add(LatLng(-14.0095923,108.8152324))
-
-        polygonOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
-
-        return googleMap.addPolygon(polygonOptions)
     }
 
     private fun extractLocations() {
@@ -177,33 +163,40 @@ class MapsFragment : Fragment() {
         }
     }
     private fun extractPolygons() {
+        val polygonOptions = PolygonOptions()
         polygonList = mutableListOf()
         lifecycleScope.launch {
             val polygonPoints = withContext(Dispatchers.IO) {
                 polygonDao.getAll()
             }
             if(!polygonPoints.isNullOrEmpty()){
+
                 polygonPoints.forEach { point ->
                     point?.let { location ->
+                        polygonOptions.add(LatLng(location.latitude, location.longitude))
                         (polygonList as MutableList<LatLng>).add(LatLng(location.latitude, location.longitude))
                     }
                 }
+
             } else {
 
-                (polygonList as MutableList<LatLng>).add(LatLng(-14.0095923,108.8152324))
-                (polygonList as MutableList<LatLng>).add(LatLng(-43.3897529,104.2449199))
-                (polygonList as MutableList<LatLng>).add(LatLng(-51.8906238,145.7292949))
-                (polygonList as MutableList<LatLng>).add(LatLng(-31.7289525,163.3074199))
-                (polygonList as MutableList<LatLng>).add(LatLng(-7.4505398,156.2761699))
-                (polygonList as MutableList<LatLng>).add(LatLng(-14.0095923,108.8152324))
+                polygonOptions.add(LatLng(-14.0095923,108.8152324))
+                polygonOptions.add(LatLng(-43.3897529,104.2449199))
+                polygonOptions.add(LatLng(-51.8906238,145.7292949))
+                polygonOptions.add(LatLng(-31.7289525,163.3074199))
+                polygonOptions.add(LatLng(-7.4505398,156.2761699))
+                polygonOptions.add(LatLng(-14.0095923,108.8152324))
 
                 Toast.makeText(requireContext(), "No points to create a personalized polygon", Toast.LENGTH_SHORT).show()
             }
+            polygonOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
+            polygon = googleMap.addPolygon(polygonOptions)
         }
     }
 
     private fun isLocationInsidePolygon(location: LatLng): Boolean {
-        return polygon != null && PolyUtil.containsLocation(location, polygon?.points, true)
+        //return polygon != null && PolyUtil.containsLocation(location, polygon?.points, true)
+        return PolyUtil.containsLocation(location, polygon.points, true)
     }
 
     @SuppressLint("MissingPermission")
@@ -220,7 +213,8 @@ class MapsFragment : Fragment() {
         googleMap.uiSettings.isTiltGesturesEnabled = true
         googleMap.uiSettings.isZoomGesturesEnabled = true
 
-        polygon = createPolygon()
+        extractPolygons()
+        extractLocations()
 
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -298,9 +292,6 @@ class MapsFragment : Fragment() {
 
         locationDao = database.locationDao()
         polygonDao = database.polygonDao()
-
-        extractPolygons()
-        extractLocations()
 
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
