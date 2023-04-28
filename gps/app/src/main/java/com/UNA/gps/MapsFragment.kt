@@ -91,9 +91,7 @@ class MapsFragment : Fragment() {
                     date = Date(),
                     itsInside = false
                 )
-                googleMap.addMarker(
-                    MarkerOptions().position(location).title(param1)
-                )
+
                 /*
                 val cameraPosition = CameraPosition.Builder()
                     .target(LatLng(location.latitude, location.longitude))
@@ -105,7 +103,14 @@ class MapsFragment : Fragment() {
                     )
                 )*/
                 if (isLocationInsidePolygon(location)){
+                    googleMap.addMarker(
+                    MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    )
                     entity.itsInside = true
+                }else{
+                    googleMap.addMarker(
+                        MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    )
                 }
                 insertEntity(entity)
             }
@@ -149,10 +154,17 @@ class MapsFragment : Fragment() {
             ubicaciones?.forEach { ubicacion ->
                 ubicacion?.let { location ->
                     val latLng = LatLng(location.latitude, location.longitude)
-                    googleMap.addMarker(MarkerOptions().position(latLng).title(param1))
+
                     // OJO CON ESTE SE DEBE DE TESTEAR SI DE VERDAD LO ESTA ACTUALIZANDO O SI ES NECESARIO ES SOLO TEST NO AFECTA
                     if (isLocationInsidePolygon(latLng)){
+                        googleMap.addMarker(MarkerOptions().position(latLng).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
                         location.itsInside = true
+                        withContext(Dispatchers.IO) {
+                            locationDao.update(location)
+                        }
+                    } else {
+                        googleMap.addMarker(MarkerOptions().position(latLng).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+                        location.itsInside = false
                         withContext(Dispatchers.IO) {
                             locationDao.update(location)
                         }
@@ -183,6 +195,7 @@ class MapsFragment : Fragment() {
                     LatLng( -14.0095923,108.8152324) }
                 (polygonList as MutableList<LatLng>).addAll(latlangList)
                 Toast.makeText(requireContext(), "No points to create a personalized polygon", Toast.LENGTH_SHORT).show()
+                println(polygonList)
             }
         }
     }
@@ -244,8 +257,12 @@ class MapsFragment : Fragment() {
                         )
                     )
                     if (isLocationInsidePolygon(currentLatLng)){
+                        googleMap.addMarker(MarkerOptions().position(currentLatLng).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
                         entity.itsInside = true
+                    } else {
+                        googleMap.addMarker(MarkerOptions().position(currentLatLng).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
                     }
+
                     insertEntity(entity)
 
                 } else {
@@ -330,10 +347,12 @@ class MapsFragment : Fragment() {
                     val markerOptions = MarkerOptions()
                         .position(LatLng(location.latitude, location.longitude))
                         .title(param1)
-                    googleMap.addMarker(markerOptions)
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     if (isLocationInsidePolygon(currentLatLng)){
+                        googleMap.addMarker(markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
                         entity.itsInside = true
                     }
+                    googleMap.addMarker(markerOptions)
                     insertEntity(entity)
                 }
             }
@@ -396,7 +415,7 @@ class MapsFragment : Fragment() {
                 //miami location
                 val currentLatLng = LatLng(25.7617, -80.1918)
                 googleMap.addMarker(
-                    MarkerOptions().position(currentLatLng).title(param1)
+                    MarkerOptions().position(currentLatLng).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                 )
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
             }
