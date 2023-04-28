@@ -133,15 +133,18 @@ class MapsFragment : Fragment() {
     private fun createPolygon(): Polygon {
         val polygonOptions = PolygonOptions()
 
-        //from polygonList
-        polygonOptions.addAll(polygonList)
+        polygonList.forEach { point ->
+            point?.let { location ->
+                println(location)
+                polygonOptions.add(location)
+            }
+        }
 
         //NO SE COMO HACER QUE SE ESPEREEEEEEEEE ESTO ES PARA QUE NO EXPLOTE Y CON AGREGARLE UNO YA LOS CARGA TODOS WTF
         //ALGO ES ALGO LA VERDAD POR AHORA YA SU MAYORIA ESTA
-        polygonOptions.add(LatLng(11.0, -84.0))
+        polygonOptions.add(LatLng(-14.0095923,108.8152324))
 
         polygonOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
-        polygonOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.purple_200))
 
         return googleMap.addPolygon(polygonOptions)
     }
@@ -186,16 +189,15 @@ class MapsFragment : Fragment() {
                     }
                 }
             } else {
-                val latlangList = List(6) {
-                    LatLng(-14.0095923,108.8152324);
-                    LatLng( -43.3897529,104.2449199);
-                    LatLng( -51.8906238,145.7292949);
-                    LatLng( -31.7289525,163.3074199);
-                    LatLng( -7.4505398,156.2761699);
-                    LatLng( -14.0095923,108.8152324) }
-                (polygonList as MutableList<LatLng>).addAll(latlangList)
+
+                (polygonList as MutableList<LatLng>).add(LatLng(-14.0095923,108.8152324))
+                (polygonList as MutableList<LatLng>).add(LatLng(-43.3897529,104.2449199))
+                (polygonList as MutableList<LatLng>).add(LatLng(-51.8906238,145.7292949))
+                (polygonList as MutableList<LatLng>).add(LatLng(-31.7289525,163.3074199))
+                (polygonList as MutableList<LatLng>).add(LatLng(-7.4505398,156.2761699))
+                (polygonList as MutableList<LatLng>).add(LatLng(-14.0095923,108.8152324))
+
                 Toast.makeText(requireContext(), "No points to create a personalized polygon", Toast.LENGTH_SHORT).show()
-                println(polygonList)
             }
         }
     }
@@ -291,79 +293,26 @@ class MapsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
-        val refreshButton = view.findViewById<Button>(R.id.refreshButton)
+        //val refreshButton = view.findViewById<Button>(R.id.refreshButton)
         val database = AppDatabase.getInstance(requireContext())
 
         locationDao = database.locationDao()
         polygonDao = database.polygonDao()
 
+        extractPolygons()
+        extractLocations()
+
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
 
-        extractPolygons()
-        extractLocations()
-
         // Set an OnClickListener to handle the button click event
-        refreshButton.setOnClickListener {
+        //refreshButton.setOnClickListener {
             // Call a method to update the user's location and add a new marker
-            updateLocationAndMarker()
-        }
-        return view
-    }
+            //updateLocationAndMarker()
+        //}
 
-    private fun updateLocationAndMarker() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            // Get the user's current location
-            val fusedLocationClient =
-                LocationServices.getFusedLocationProviderClient(requireContext())
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                // Check if the location is not null
-                location?.let {
-                    val entity = LocationEntity(
-                        id = null,
-                        latitude = location.latitude,
-                        longitude = location.longitude,
-                        date = Date(),
-                        itsInside = false
-                    )
-                    val currentLatLng = LatLng(location.latitude, location.longitude)
-                    // Update the map camera to the new location
-                    val cameraPosition = CameraPosition.Builder()
-                        .target(LatLng(location.latitude, location.longitude))
-                        .zoom(15f)
-                        .build()
-                    googleMap.animateCamera(
-                        CameraUpdateFactory.newCameraPosition(
-                            cameraPosition
-                        )
-                    )
-                    println(polygonList)
-                    // Add a new marker at the new location
-                    val markerOptions = MarkerOptions()
-                        .position(LatLng(location.latitude, location.longitude))
-                        .title(param1)
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    if (isLocationInsidePolygon(currentLatLng)){
-                        googleMap.addMarker(markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
-                        entity.itsInside = true
-                    }
-                    googleMap.addMarker(markerOptions)
-                    insertEntity(entity)
-                }
-            }
-        } else {
-            // Request location permissions if not granted
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
-            )
-        }
+        return view
     }
 
 
