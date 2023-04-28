@@ -7,7 +7,8 @@
     <string name="drawer_open">Abrir Menu</string>
     <string name="drawer_close">Cerrar Menu</string>
     <string name="nav_conf">Configuracion</string>
-    <string name="nuevo_texto_de_marcador">Nuevo texto de marcador</string>
+    <string name="nuevo_texto_de_marcador">Nombre del marcador</string>
+    <string name="fecha">Fecha de los marcadores a mostrar</string>
     <string name="refresh_location">Refresh Location</string>
     <string name="add_new_point">Add new point</string>
     <string name="nav_polygon">Manage Polygon</string>
@@ -16,4 +17,5 @@
     <string name="enter_the_latitude_and_longitude_of_the_new_point">Enter the latitude and longitude of the new point:</string>
     <string name="polygon">POLYGON</string>
     <string name="agregar_punto">Agregar punto</string>
+    <string name="actualizar">Actualizar</string>
 </resources>

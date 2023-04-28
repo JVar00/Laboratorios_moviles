@@ -12,10 +12,12 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
+import java.util.Date
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, ConfigFragment.OnMessageSendListener {
     lateinit var drawerLayout: DrawerLayout
     lateinit var messageDefault : String
+    lateinit var fechaDefault : Date
     lateinit var messageBundle : Bundle
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,10 +65,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //if messageBundle is empty then set default message
         if(!::messageBundle.isInitialized){
+
             messageDefault = "Mi marcador por default"
+            fechaDefault = Date()
+
             val bundle = Bundle()
             bundle.putString("message", messageDefault)
+            bundle.putSerializable("fecha", fechaDefault)
             messageBundle = bundle
+
         }
 
         when (item.itemId){
@@ -94,9 +101,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    override fun onMessageSent(message: String) {
+    override fun onMessageSent(message: String, fecha: Date) {
         val bundle = Bundle()
         bundle.putString("message", message)
+        bundle.putSerializable("fecha", fecha)
+        println(fecha)
         messageBundle = bundle
     }
 

@@ -49,6 +49,7 @@ class MapsFragment : Fragment() {
 
     private lateinit var locationReceiver: BroadcastReceiver
     private var param1: String? = "Marcador default por maps"
+    private var fecha: Date? = Date()
     private lateinit var locationDao: LocationDAO
     private lateinit var polygonDao: PolygonDAO
     private lateinit var polygon: Polygon
@@ -58,6 +59,7 @@ class MapsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString("message")
+            fecha = it.getSerializable("fecha") as Date?
         }
         locationDao = AppDatabase.getInstance(requireContext()).locationDao()
         polygonDao = AppDatabase.getInstance(requireContext()).polygonDao()
@@ -102,21 +104,23 @@ class MapsFragment : Fragment() {
                         cameraPosition
                     )
                 )*/
+
                 lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        locationDao.insert(entity)
+                    withContext(Dispatchers.Main) {
+                        if (isLocationInsidePolygon(location)){
+                            googleMap.addMarker(
+                                MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                            )
+                            entity.itsInside = true
+                        }else{
+                            googleMap.addMarker(
+                                MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            )
+                        }
                     }
                 }
-                if (isLocationInsidePolygon(location)){
-                    googleMap.addMarker(
-                    MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                    )
-                    entity.itsInside = true
-                }else{
-                    googleMap.addMarker(
-                        MarkerOptions().position(location).title(param1).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    )
-                }
+
+
                 insertEntity(entity)
             }
         }
@@ -140,7 +144,25 @@ class MapsFragment : Fragment() {
             val ubicaciones = withContext(Dispatchers.IO) {
                 locationDao.getAll()
             }
-            ubicaciones?.forEach { ubicacion ->
+
+            val calendar = Calendar.getInstance()
+            calendar.time = fecha
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+
+            val entidadesFiltradas = ubicaciones?.filter { entidad ->
+                val entidadCalendar = Calendar.getInstance()
+                entidadCalendar.time = entidad?.date!!
+                entidadCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                entidadCalendar.set(Calendar.MINUTE, 0)
+                entidadCalendar.set(Calendar.SECOND, 0)
+                entidadCalendar.set(Calendar.MILLISECOND, 0)
+                entidadCalendar.time == calendar.time
+            }
+
+            entidadesFiltradas?.forEach { ubicacion ->
                 ubicacion?.let { location ->
                     val latLng = LatLng(location.latitude, location.longitude)
 
@@ -215,6 +237,8 @@ class MapsFragment : Fragment() {
 
         extractPolygons()
         extractLocations()
+
+        println(fecha)
 
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
