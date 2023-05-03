@@ -18,10 +18,12 @@ import android.annotation.SuppressLint
 import android.content.*
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.IBinder
 
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 
 import androidx.core.app.ActivityCompat
@@ -217,8 +219,11 @@ class MapsFragment : Fragment() {
     }
 
     private fun isLocationInsidePolygon(location: LatLng): Boolean {
-        //return polygon != null && PolyUtil.containsLocation(location, polygon?.points, true)
-        return PolyUtil.containsLocation(location, polygon.points, true)
+        if(PolyUtil.containsLocation(location, polygon.points, true)){
+            makePhoneCall2()
+            return true
+        }
+        return false
     }
 
     @SuppressLint("MissingPermission")
@@ -351,6 +356,23 @@ class MapsFragment : Fragment() {
         context?.registerReceiver(locationReceiver, IntentFilter("ubicacionActualizada"))
 
 
+    }
+
+    fun makePhoneCall2() {
+        val permission = android.Manifest.permission.CALL_PHONE
+        if (ContextCompat.checkSelfPermission(
+                this.requireContext(),
+                permission
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Permiso no concedido
+            ActivityCompat.requestPermissions(this.requireActivity(), arrayOf(permission), 1)
+
+        } else {
+            val intent = Intent(Intent.ACTION_CALL)
+            intent.data = Uri.parse("tel:${PhoneFragment.phone_number}")
+            startActivity(intent)
+        }
     }
 
 

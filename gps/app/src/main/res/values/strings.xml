@@ -18,4 +18,5 @@
     <string name="polygon">POLYGON</string>
     <string name="agregar_punto">Agregar punto</string>
     <string name="actualizar">Actualizar</string>
+    <string name="phone">Telefono</string>
 </resources>

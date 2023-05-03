@@ -92,6 +92,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.polygon -> {
                 fragment = PolygonFragment()
             }
+            R.id.phone -> {
+                fragment = PhoneFragment()
+            }
+
         }
         supportFragmentManager.beginTransaction()
             .replace(R.id.home_content, fragment)

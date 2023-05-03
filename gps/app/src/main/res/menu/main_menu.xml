@@ -13,12 +13,17 @@
         <item
             android:id="@+id/conf"
             android:title="@string/nav_conf"
-            android:icon="@android:drawable/ic_menu_mapmode"
+            android:icon="@android:drawable/ic_menu_set_as"
             />
         <item
             android:id="@+id/polygon"
             android:title="@string/nav_polygon"
-            android:icon="@android:drawable/ic_menu_mapmode"
+            android:icon="@android:drawable/ic_menu_add"
+            />
+        <item
+            android:id="@+id/phone"
+            android:title="Telefono Emergencia"
+            android:icon="@android:drawable/stat_sys_phone_call"
             />
     </group>
 </menu>
