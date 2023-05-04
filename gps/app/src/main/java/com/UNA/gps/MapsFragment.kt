@@ -241,8 +241,6 @@ class MapsFragment : Fragment() {
         googleMap.uiSettings.isZoomGesturesEnabled = true
 
         extractPolygons()
-        extractLocations()
-
         println(fecha)
 
         if (ActivityCompat.checkSelfPermission(
@@ -257,7 +255,7 @@ class MapsFragment : Fragment() {
             )
         } else {
             googleMap.isMyLocationEnabled = true
-
+            extractLocations()
             val fusedLocationClient =
                 LocationServices.getFusedLocationProviderClient(requireContext())
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
