@@ -7,8 +7,10 @@ import retrofit2.http.*
 
 interface TomaArterialDAO {
 
+
+
     @GET("tomas")
-    suspend fun getItems(): List<TomaArterial>
+    suspend fun getItems(): TomasArteriales
 
     @GET("tomas/{uuid}")
     suspend fun getItem(@Path("uuid") uuid: String): TomaArterial

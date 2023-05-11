@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import cr.ac.una.controlarterial.R
 import cr.ac.una.controlarterial.entity.TomaArterial
+import cr.ac.una.controlarterial.entity.TomasArteriales
 
 
 class ListAdapter(context: Context, tomasArteriales: List<TomaArterial>) :

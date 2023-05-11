@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import cr.ac.una.controlarterial.DAO.TomaArterialDAO
 import cr.ac.una.controlarterial.adapter.ListAdapter
@@ -54,12 +53,12 @@ class FirstFragment : Fragment() {
         ///
 
         val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor("WuwB3r4rJZ57hFwOmBTTip5tYaXvlMfQmST0bR5Edo54z5IJ3w"))
+            .addInterceptor(AuthInterceptor("8PsQ4uLLRz5t816BXG_APX322Z5k1vTPZQvm1Yi6MH-0bT5e5w"))
             // .addInterceptor(interceptor)
                 
             .build()
 
-        // val gson = GsonBuilder().setPrettyPrinting().create()
+        //val gson = GsonBuilder().setPrettyPrinting().create()
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://crudapi.co.uk/api/v1/")
@@ -80,11 +79,10 @@ class FirstFragment : Fragment() {
 
                 // Procesar la respuesta del API
                 val listView = view.findViewById<ListView>(R.id.listview_first)
-                val adapter = context?.let{ ListAdapter(it, loadItems) }
+                val adapter = context?.let{ loadItems.items?.let { it1 -> ListAdapter(it, it1) } }
                 listView.adapter = adapter
 
             }
-
 
         }
 
