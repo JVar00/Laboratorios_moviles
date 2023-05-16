@@ -22,6 +22,14 @@ class TomaArterialViewModel: ViewModel() {
         _tomasArteriales.postValue(list.items)
     }
 
+    suspend fun addItem(distolica : Int, sistolica : Int, ritmo : Int){
+        init()
+        var item = TomaArterial(_uuid = null, distolica = distolica, sistolica = sistolica, ritmo = ritmo)
+        var items = ArrayList<TomaArterial>()
+        items.add(item)
+        apiService.createItem(items)
+    }
+
     fun init() {
         val client = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor("WuwB3r4rJZ57hFwOmBTTip5tYaXvlMfQmST0bR5Edo54z5IJ3w"))

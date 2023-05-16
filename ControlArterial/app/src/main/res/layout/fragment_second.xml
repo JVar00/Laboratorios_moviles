@@ -11,25 +11,74 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
+        <EditText
+            android:id="@+id/RitmoText"
+            android:layout_width="172dp"
+            android:layout_height="48dp"
+            android:ems="10"
+            android:hint="Ritmo"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
         <Button
             android:id="@+id/button_second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/previous"
-            app:layout_constraintBottom_toTopOf="@id/textview_second"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textview_second"
+        <Button
+            android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/lorem_ipsum"
+            android:text="Send"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_second" />
+            app:layout_constraintTop_toBottomOf="@+id/RitmoText"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="82dp" />
+
+        <EditText
+            android:id="@+id/DistolicaText"
+            android:layout_width="183dp"
+            android:layout_height="51dp"
+            android:ems="10"
+            android:hint="Distolica"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+        <EditText
+            android:id="@+id/SistolicaText"
+            android:layout_width="171dp"
+            android:layout_height="51dp"
+            android:ems="10"
+            android:hint="Sistolica"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="171dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
