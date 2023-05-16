@@ -6,11 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import cr.ac.una.controlarterial.DAO.TomaArterialDAO
 import cr.ac.una.controlarterial.adapter.ListAdapter
 import cr.ac.una.controlarterial.databinding.FragmentFirstBinding
 import cr.ac.una.controlarterial.entity.TomaArterial
+import cr.ac.una.controlarterial.viewModel.TomaArterialViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -50,39 +53,23 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ///
+        val listView = view.findViewById<ListView>(R.id.listview_first)
+        val adapter = ListAdapter(requireContext(), mutableListOf<TomaArterial>())
+        listView.adapter = adapter
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor("8PsQ4uLLRz5t816BXG_APX322Z5k1vTPZQvm1Yi6MH-0bT5e5w"))
-            // .addInterceptor(interceptor)
-                
-            .build()
+        val viewModel = ViewModelProvider(this).get(TomaArterialViewModel::class.java)
 
-        //val gson = GsonBuilder().setPrettyPrinting().create()
+        viewModel.tomasArteriales.observe(viewLifecycleOwner) { elementos ->
+            adapter.clear()
+            adapter.addAll(elementos)
+            adapter.notifyDataSetChanged()
+        }
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://crudapi.co.uk/api/v1/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
 
-        val apiService = retrofit.create(TomaArterialDAO::class.java)
 
         GlobalScope.launch(Dispatchers.IO) {
-            val item = TomaArterial(_uuid = null, distolica = 100, sistolica = 200, ritmo = 300)
-            var items = ArrayList<TomaArterial>()
-            items.add(item)
-            val createdItem = apiService.createItem(items)
-            val loadItems = apiService.getItems()
 
-            withContext(Dispatchers.Main) {
-
-                // Procesar la respuesta del API
-                val listView = view.findViewById<ListView>(R.id.listview_first)
-                val adapter = context?.let{ loadItems.items?.let { it1 -> ListAdapter(it, it1) } }
-                listView.adapter = adapter
-
-            }
+            viewModel.getItems()!!
 
         }
 
