@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import cr.ac.una.controlarterial.databinding.FragmentSecondBinding
@@ -14,6 +15,7 @@ import cr.ac.una.controlarterial.viewModel.TomaArterialViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -46,16 +48,33 @@ class SecondFragment : Fragment() {
         val buttonSend = view.findViewById<Button>(R.id.button)
 
         buttonSend.setOnClickListener{
+
             GlobalScope.launch(Dispatchers.IO) {
-                viewModel.addItem(textDistolica.text, textSistolica.text, textRitmo.text)!!
+
+                var distolica = textDistolica.text.toString().toInt()
+                var sistolica = textSistolica.text.toString().toInt()
+                var ritmo = textRitmo.text.toString().toInt()
+
+                viewModel.addItem(distolica, sistolica, ritmo)
+
+                //get back to main thread
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Presion arterial agregada!", Toast.LENGTH_SHORT).show()
+
+                    textDistolica.setText("")
+                    textSistolica.setText("")
+                    textRitmo.setText("")
+                }
+
             }
+
         }
 
-
-
+        /*
         binding.buttonSecond.setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
-        }
+        }*/
+
     }
 
     override fun onDestroyView() {
