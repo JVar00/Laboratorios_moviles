@@ -16,6 +16,13 @@ class TomaArterialViewModel: ViewModel() {
     var tomasArteriales : LiveData<List<TomaArterial>> = _tomasArteriales
     private lateinit var apiService : TomaArterialDAO
 
+    suspend fun deleteItem(uuid:String?){
+        init()
+        if (uuid != null) {
+            apiService.deleteItem(uuid)
+        }
+    }
+
     suspend fun getItems(){
         init()
         val list = apiService.getItems()
