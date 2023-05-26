@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'cr.ac.una.controlarterial'
+    namespace 'cr.ac.una.dreamTeam'
     compileSdk 33
 
     defaultConfig {
-        applicationId "cr.ac.una.controlarterial"
+        applicationId "cr.ac.una.dreamTeam"
         minSdk 27
         targetSdk 33
         versionCode 1
