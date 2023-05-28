@@ -56,6 +56,10 @@ class AddFragment : Fragment() {
             viewModel.addItem(name, last, age)
             Toast.makeText(context, "Persona agregada", Toast.LENGTH_SHORT).show()
 
+            textName.setText("")
+            textLast.setText("")
+            textAge.setText("")
+
         }
 
         /*

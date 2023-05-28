@@ -33,8 +33,6 @@ class PersonaModelView : ViewModel() {
     }
 
     fun init(){
-
-
         // Obtener referencia a la base de datos "personas"
         val database = FirebaseDatabase.getInstance()
         personaRef = database.getReference("persona")
