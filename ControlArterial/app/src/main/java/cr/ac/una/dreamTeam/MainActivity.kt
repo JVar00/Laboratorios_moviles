@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.fab.setOnClickListener { view ->
             navController.navigate(R.id.action_FirstFragment_to_SecondFragment)
+            //************************* transfer to the first fragment view *************************
         }
     }
 
