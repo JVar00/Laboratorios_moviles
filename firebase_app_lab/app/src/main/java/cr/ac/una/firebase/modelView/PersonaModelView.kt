@@ -15,14 +15,23 @@ class PersonaModelView : ViewModel() {
 
     fun deleteItem(uuid:String?){
         init()
-        if (uuid != null) {
-            //
-        }
+        personaRef.child(uuid!!).removeValue()
     }
 
     fun getItems(){
         init()
+        personaRef.get().addOnSuccessListener {
+            if (it.exists()){
+                val personaList = mutableListOf<Persona>()
+                for (persona in it.children){
+                    val personaT = persona.getValue(Persona::class.java)
+                    personaT?._uuid = persona.key
 
+                    personaList.add(personaT!!)
+                }
+                _personas.postValue(personaList)
+            }
+        }
     }
 
     fun addItem(name : String, last : String, age : Int){
@@ -36,6 +45,7 @@ class PersonaModelView : ViewModel() {
         // Obtener referencia a la base de datos "personas"
         val database = FirebaseDatabase.getInstance()
         personaRef = database.getReference("persona")
+
     }
 
 }

@@ -84,7 +84,8 @@ class ViewFragment : Fragment() {
                     if (position != 0) {
 
                         val entity = (personas as MutableList<Persona>).get(position)
-                        //viewModel.deleteItem(entity._uuid)!!
+                        println(entity._uuid)
+                        viewModel.deleteItem(entity._uuid)
 
                         // Elimina el elemento cuando se detecta el deslizamiento hacia la derecha
                         (personas as MutableList<Persona>).removeAt(position)
