@@ -1,48 +1,40 @@
 package cr.ac.una.spotify_caleb_jeff.adapter
 
-import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import cr.ac.una.spotify_caleb_jeff.R
 import cr.ac.una.spotify_caleb_jeff.entity.Album
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 
 class SearchAdapter(var tracks: ArrayList<Track>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val VIEW_TYPE_HEADER = 0
     private val VIEW_TYPE_ITEM = 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == VIEW_TYPE_HEADER) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_header, parent, false)
-            HeaderViewHolder(view)
-        } else {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-            ViewHolder(view)
-        }
 
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
+        return ViewHolder(view)
 
     }
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            VIEW_TYPE_HEADER
-        } else {
-            VIEW_TYPE_ITEM
-        }
+        return VIEW_TYPE_ITEM
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = tracks[position]
-
-        if (holder is HeaderViewHolder) {
-            holder.bind()
-        } else if (holder is ViewHolder) {
-            val controlArterialItem = item
-            holder.bind(controlArterialItem)
-        }
+       if (holder is ViewHolder) {
+            holder.bind(tracks[position])
+       }
     }
 
     override fun getItemCount(): Int {
@@ -52,54 +44,49 @@ class SearchAdapter(var tracks: ArrayList<Track>) :
 
         tracks = newData
         if (!newData.isEmpty())
-            newData.add(0,Track("", Album(""),""))
+            newData.add(0,Track("", Album("", ""),"", ""))
         notifyDataSetChanged()
     }
 
-    inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        fun bind(){
-            /*
-            val sistolicaTextView = itemView.findViewById<TextView>(R.id.sistolica)
-            val distolicaTextView = itemView.findViewById<TextView>(R.id.distolica)
-            val ritmoTextView = itemView.findViewById<TextView>(R.id.ritmo)
-            sistolicaTextView.text = "Sistólica"
-            distolicaTextView.text = "Diastólica"
-            ritmoTextView.text = "Ritmo"
-             */
-        }
-
-    }
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        /*
-        val sistolicaTextView = itemView.findViewById<TextView>(R.id.sistolica)
-        val distolicaTextView = itemView.findViewById<TextView>(R.id.distolica)
-        val ritmoTextView = itemView.findViewById<TextView>(R.id.ritmo)
-        */
+        val trackName_View = itemView.findViewById<TextView>(R.id.song_title)
+        val albumImage_View = itemView.findViewById<ImageView>(R.id.song_image)
+        val artistName_View = itemView.findViewById<TextView>(R.id.artist_name)
+        val loadingWheel = itemView.findViewById<ProgressBar>(R.id.loading_progress)
 
         fun bind(track: Track) {
 
-            /*
-            val sistolica = tomaArterial.sistolica.toString()
-            val distolica = tomaArterial.distolica.toString()
+            loadingWheel.visibility = View.VISIBLE
 
-            if(distolica.toInt() < 120 && sistolica.toInt() < 80){
-                itemView.setBackgroundColor (Color.GREEN)
-            }else if(distolica.toInt() in 120..129 && sistolica.toInt() < 80){
-                itemView.setBackgroundColor (Color.YELLOW)
-            }else if(distolica.toInt() in 130..139 && sistolica.toInt() in 80..89){
-                itemView.setBackgroundColor (Color.argb(0, 35, 100, 0))
-            }else if(distolica.toInt() in 140..179 && sistolica.toInt() in 90..119){
-                itemView.setBackgroundColor (Color.argb(0, 69, 7, 14))
-            }else{
-                itemView.setBackgroundColor (Color.RED)
-            }
+            val trackName = track.name
+            val artistName = track.artist
+            val albumImageURL = track.album.imageURL
+            val albumName = track.album.name
 
-            sistolicaTextView.text = tomaArterial.sistolica.toString()
-            distolicaTextView.text = tomaArterial.distolica.toString()
-            ritmoTextView.text = tomaArterial.ritmo.toString()
-             */
+            trackName_View.text = trackName
+            artistName_View.text = artistName
 
+            Glide.with(itemView).load(albumImageURL).listener(object: RequestListener<Drawable> {
+
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    loadingWheel.visibility = View.GONE
+                    return false
+                }
+
+                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                    loadingWheel.visibility = View.GONE
+                    return false
+                }
+
+            }).error(R.drawable.ic_launcher_foreground).into(albumImage_View)
+
+            albumImage_View.contentDescription = albumName
 
         }
     }

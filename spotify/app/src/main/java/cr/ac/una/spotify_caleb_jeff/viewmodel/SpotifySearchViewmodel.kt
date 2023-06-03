@@ -1,5 +1,8 @@
 package cr.ac.una.spotify_caleb_jeff.viewmodel
 
+import android.util.Base64
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,9 +13,12 @@ import cr.ac.una.spotify_caleb_jeff.entity.History
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
 import cr.ac.una.spotify_caleb_jeff.service.SpotifyService
 
-import okhttp3.OkHttpClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import okhttp3.OkHttpClient
 
 class SpotifySearchViewmodel: ViewModel() {
 
@@ -20,26 +26,12 @@ class SpotifySearchViewmodel: ViewModel() {
     var tracks : LiveData<List<Track>> = _tracks
     private lateinit var apiService : HistoryDAO
 
-    suspend fun getTracks(){
-        init()
+    private var _errorMessage: MutableLiveData<String> = MutableLiveData()
+    var errorMessage: LiveData<String> = _errorMessage
+
+    fun displayErrorMessage(message: String) {
+        _errorMessage.value = message
     }
-
-    suspend fun addHistory(){
-        init()
-    }
-
-    suspend fun deleteHistoryItem(){
-        init()
-    }
-
-    fun init() {
-
-    }
-
-}
-
-/*
-    searchTracks("iron maiden")
 
     private val spotifyServiceToken: SpotifyService by lazy {
         val retrofit = Retrofit.Builder()
@@ -58,17 +50,20 @@ class SpotifySearchViewmodel: ViewModel() {
         retrofit.create(SpotifyService::class.java)
     }
 
-    private fun searchTracks(query: String) {
+    fun getAccessToken(): Call<AccessTokenResponse> {
         val clientId = "f13969da015a4f49bb1f1edef2185d4e"
         val clientSecret = "e3077426f4714315937111d5e82cd918"
         val base64Auth = Base64.encodeToString("$clientId:$clientSecret".toByteArray(), Base64.NO_WRAP)
 
-        val tokenRequest = spotifyServiceToken.getAccessToken(
+        return spotifyServiceToken.getAccessToken(
             "Basic $base64Auth",
             "client_credentials"
         )
+    }
 
+   fun search(query: String){
 
+        val tokenRequest = getAccessToken()
         tokenRequest.enqueue(object : Callback<AccessTokenResponse> {
             override fun onResponse(call: Call<AccessTokenResponse>, response: Response<AccessTokenResponse>) {
                 if (response.isSuccessful) {
@@ -82,15 +77,21 @@ class SpotifySearchViewmodel: ViewModel() {
                             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
                                 if (response.isSuccessful) {
                                     val trackResponse = response.body()
+                                    val trackList = mutableListOf<Track>()
 
                                     if (trackResponse != null && trackResponse.tracks.items.isNotEmpty()) {
                                         for (track in trackResponse!!.tracks.items){
-                                            System.out.println(track.name + track.album.name)
+
+                                            //////////////////FUNCTIONALITY/////////////////////
+
+                                            println("Track: " + track.name)
 
                                         }
+                                        _tracks.postValue(trackList)
                                     } else {
                                         displayErrorMessage("No se encontraron canciones.")
                                     }
+
                                 } else {
                                     System.out.println("Mensaje:    "+response.raw())
                                     displayErrorMessage("Error en la respuesta del servidor.")
@@ -116,13 +117,25 @@ class SpotifySearchViewmodel: ViewModel() {
         })
     }
 
-    private fun displayTrackInfo(trackName: String, artistName: String) {
-        val message = "Canción encontrada: $trackName - $artistName"
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    suspend fun addHistory(){
+        initDatabase()
     }
 
-    private fun displayErrorMessage(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+    suspend fun deleteHistoryItem(){
+        initDatabase()
     }
+
+}
+    private fun initDatabase() {
+        //apiService = HistoryDAO()
+    }
+/*
+
+    private fun displayTrackInfo(trackName: String, artistName: String) {
+        val message = "Canción encontrada: $trackName - $artistName"
+
+    }
+
+
 
  */

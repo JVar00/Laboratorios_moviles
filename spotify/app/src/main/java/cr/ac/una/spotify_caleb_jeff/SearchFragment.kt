@@ -5,9 +5,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import cr.ac.una.spotify_caleb_jeff.adapter.SearchAdapter
 import cr.ac.una.spotify_caleb_jeff.databinding.FragmentSearchBinding
+import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.viewmodel.SpotifySearchViewmodel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * A simple [Fragment] subclass.
@@ -17,6 +27,7 @@ import cr.ac.una.spotify_caleb_jeff.viewmodel.SpotifySearchViewmodel
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
+    private lateinit var tracks: List<Track>
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -35,44 +46,43 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        tracks = mutableListOf<Track>()
+
+        val listView = view.findViewById<RecyclerView>(R.id.list_view)
+        val adapter = SearchAdapter(tracks as ArrayList<Track>)
+        listView.adapter = adapter
+        listView.layoutManager = LinearLayoutManager(requireContext())
+
         val viewModel = ViewModelProvider(this).get(SpotifySearchViewmodel::class.java)
+        val searchField = view.findViewById<SearchView>(R.id.search_bar)
 
-        /*
+        viewModel.tracks.observe(viewLifecycleOwner) { elementos ->
+            adapter.updateData(elementos as ArrayList<Track>)
+            tracks = elementos
+        }
 
-        val textDistolica = view.findViewById<EditText>(R.id.DistolicaText)
-        val textSistolica = view.findViewById<EditText>(R.id.SistolicaText)
-        val textRitmo = view.findViewById<EditText>(R.id.RitmoText)
-        val buttonSend = view.findViewById<Button>(R.id.button)
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+        }
 
-        buttonSend.setOnClickListener{
-
+        //listener to the text field to search for the artist while typing
+        searchField.setOnKeyListener { _, _, _ ->
+            /*
             GlobalScope.launch(Dispatchers.IO) {
-
-                var distolica = textDistolica.text.toString().toInt()
-                var sistolica = textSistolica.text.toString().toInt()
-                var ritmo = textRitmo.text.toString().toInt()
-
-                viewModel.addItem(distolica, sistolica, ritmo)
-
-                //get back to main thread
+                viewModel.search(searchField.query.toString())
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Presion arterial agregada!", Toast.LENGTH_SHORT).show()
-
-                    textDistolica.setText("")
-                    textSistolica.setText("")
-                    textRitmo.setText("")
+                    false
                 }
-
             }
-
+            */
+            viewModel.search(searchField.query.toString())
+            false
         }
 
         /*
         binding.buttonSecond.setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }*/
-
-        */
 
     }
 

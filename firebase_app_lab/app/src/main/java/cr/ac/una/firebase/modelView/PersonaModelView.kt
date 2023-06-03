@@ -15,7 +15,7 @@ class PersonaModelView : ViewModel() {
 
     fun deleteItem(uuid:String?){
         init()
-        personaRef.child(uuid!!).removeValue()
+        personaRef.child(uuid!!).removeValue()_
     }
 
     fun getItems(){

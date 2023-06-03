@@ -6,14 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import cr.ac.una.spotify_caleb_jeff.databinding.FragmentSecondBinding
+import cr.ac.una.spotify_caleb_jeff.databinding.FragmentTrackBinding
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class TrackFragment : Fragment() {
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentTrackBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -24,7 +24,7 @@ class TrackFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentTrackBinding.inflate(inflater, container, false)
         return binding.root
 
     }
