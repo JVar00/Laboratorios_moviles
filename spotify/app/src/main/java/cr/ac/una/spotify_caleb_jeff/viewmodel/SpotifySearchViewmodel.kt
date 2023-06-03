@@ -1,15 +1,17 @@
 package cr.ac.una.spotify_caleb_jeff.viewmodel
 
 import android.util.Base64
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cr.ac.una.spotify_caleb_jeff.DAO.HistoryDAO
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.entity.AccessTokenResponse
-import cr.ac.una.spotify_caleb_jeff.entity.History
+import cr.ac.una.spotify_caleb_jeff.entity.Album
+import cr.ac.una.spotify_caleb_jeff.entity.AlbumCovers
+import cr.ac.una.spotify_caleb_jeff.entity.Artist
+import cr.ac.una.spotify_caleb_jeff.entity.Artists
+import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
 import cr.ac.una.spotify_caleb_jeff.service.SpotifyService
 
@@ -82,12 +84,30 @@ class SpotifySearchViewmodel: ViewModel() {
                                     if (trackResponse != null && trackResponse.tracks.items.isNotEmpty()) {
                                         for (track in trackResponse!!.tracks.items){
 
-                                            //////////////////FUNCTIONALITY/////////////////////
+                                            // Create a Track object and populate its properties
+                                            val album = track.album
+                                            val artists = track.artists
 
+                                            val imageUrl = album.images.items[0].url ?: ""
+                                            val cover = List(1) { Cover(imageUrl) }
+
+                                            val albumName = album.name ?: ""
+                                            val artistName = artists.items[0].name ?: ""
+                                            val artist = List(1) { Artist(artistName) }
+
+                                            val trackObject = Track(
+                                                track.name,
+                                                Album(albumName, AlbumCovers(cover)),
+                                                Artists(artist),
+                                                track.uri
+                                            )
+
+                                            trackList.add(trackObject)
                                             println("Track: " + track.name)
 
                                         }
                                         _tracks.postValue(trackList)
+
                                     } else {
                                         displayErrorMessage("No se encontraron canciones.")
                                     }

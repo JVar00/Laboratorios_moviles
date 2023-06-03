@@ -66,18 +66,17 @@ class SearchFragment : Fragment() {
         }
 
         //listener to the text field to search for the artist while typing
-        searchField.setOnKeyListener { _, _, _ ->
-            /*
-            GlobalScope.launch(Dispatchers.IO) {
-                viewModel.search(searchField.query.toString())
-                withContext(Dispatchers.Main) {
-                    false
-                }
+
+        searchField.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                viewModel.search(query)
+                return true
             }
-            */
-            viewModel.search(searchField.query.toString())
-            false
-        }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                return false
+            }
+        })
 
         /*
         binding.buttonSecond.setOnClickListener {

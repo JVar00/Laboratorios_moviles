@@ -15,6 +15,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import cr.ac.una.spotify_caleb_jeff.R
 import cr.ac.una.spotify_caleb_jeff.entity.Album
+import cr.ac.una.spotify_caleb_jeff.entity.AlbumCovers
+import cr.ac.una.spotify_caleb_jeff.entity.Artist
+import cr.ac.una.spotify_caleb_jeff.entity.Artists
+import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 
 class SearchAdapter(var tracks: ArrayList<Track>) :
@@ -41,10 +45,11 @@ class SearchAdapter(var tracks: ArrayList<Track>) :
         return tracks.size
     }
     fun updateData(newData: ArrayList<Track>) {
-
         tracks = newData
+        val covers = List(1) { Cover("") }
+        val artists = List(1) { Artist("") }
         if (!newData.isEmpty())
-            newData.add(0,Track("", Album("", ""),"", ""))
+            newData.add(0,Track("", Album("", AlbumCovers(covers)), Artists(artists), ""))
         notifyDataSetChanged()
     }
 
@@ -60,8 +65,8 @@ class SearchAdapter(var tracks: ArrayList<Track>) :
             loadingWheel.visibility = View.VISIBLE
 
             val trackName = track.name
-            val artistName = track.artist
-            val albumImageURL = track.album.imageURL
+            val artistName = track.artists.items[0].name
+            val albumImageURL = track.album.images.items[0].url
             val albumName = track.album.name
 
             trackName_View.text = trackName
