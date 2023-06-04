@@ -8,9 +8,7 @@ import cr.ac.una.spotify_caleb_jeff.DAO.HistoryDAO
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.entity.AccessTokenResponse
 import cr.ac.una.spotify_caleb_jeff.entity.Album
-import cr.ac.una.spotify_caleb_jeff.entity.AlbumCovers
 import cr.ac.una.spotify_caleb_jeff.entity.Artist
-import cr.ac.una.spotify_caleb_jeff.entity.Artists
 import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
 import cr.ac.una.spotify_caleb_jeff.service.SpotifyService
@@ -20,7 +18,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import okhttp3.OkHttpClient
 
 class SpotifySearchViewmodel: ViewModel() {
 
@@ -31,7 +28,7 @@ class SpotifySearchViewmodel: ViewModel() {
     private var _errorMessage: MutableLiveData<String> = MutableLiveData()
     var errorMessage: LiveData<String> = _errorMessage
 
-    fun displayErrorMessage(message: String) {
+   private fun displayErrorMessage(message: String) {
         _errorMessage.value = message
     }
 
@@ -52,7 +49,7 @@ class SpotifySearchViewmodel: ViewModel() {
         retrofit.create(SpotifyService::class.java)
     }
 
-    fun getAccessToken(): Call<AccessTokenResponse> {
+    private fun getAccessToken(): Call<AccessTokenResponse> {
         val clientId = "f13969da015a4f49bb1f1edef2185d4e"
         val clientSecret = "e3077426f4714315937111d5e82cd918"
         val base64Auth = Base64.encodeToString("$clientId:$clientSecret".toByteArray(), Base64.NO_WRAP)
@@ -75,34 +72,41 @@ class SpotifySearchViewmodel: ViewModel() {
                     if (accessToken != null) {
 
                         val searchRequest = spotifyService.searchTrack("Bearer $accessToken", query)
+                        println(searchRequest)
                         searchRequest.enqueue(object : Callback<TrackResponse> {
                             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
                                 if (response.isSuccessful) {
                                     val trackResponse = response.body()
                                     val trackList = mutableListOf<Track>()
 
+                                    println(trackResponse)
+
                                     if (trackResponse != null && trackResponse.tracks.items.isNotEmpty()) {
-                                        for (track in trackResponse!!.tracks.items){
+                                        println(trackResponse)
+                                        for (track in trackResponse.tracks.items){
 
                                             // Create a Track object and populate its properties
                                             val album = track.album
-                                            val artists = track.artists
+                                            val artists = track.artists[0]
 
-                                            val imageUrl = album.images.items[0].url ?: ""
-                                            val cover = List(1) { Cover(imageUrl) }
+                                            val albumName = album.name
+                                            val imageUrl = album.images[0].url
+                                            val cover = ArrayList<Cover>()
+                                            cover.add(Cover(imageUrl))
 
-                                            val albumName = album.name ?: ""
-                                            val artistName = artists.items[0].name ?: ""
-                                            val artist = List(1) { Artist(artistName) }
+                                            val artistName = artists.name
+                                            val artist = ArrayList<Artist>()
+                                            artist.add(Artist(artistName))
 
                                             val trackObject = Track(
                                                 track.name,
-                                                Album(albumName, AlbumCovers(cover)),
-                                                Artists(artist),
+                                                Album(albumName, cover),
+                                                artist,
                                                 track.uri
                                             )
 
                                             trackList.add(trackObject)
+
                                             println("Track: " + track.name)
 
                                         }
@@ -119,7 +123,8 @@ class SpotifySearchViewmodel: ViewModel() {
                             }
 
                             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                                displayErrorMessage("Error en la solicitud de búsqueda.")
+                                println(t)
+                                displayErrorMessage(t.message ?: "Error en la solicitud de búsqueda.")
                             }
                         })
                     } else {
