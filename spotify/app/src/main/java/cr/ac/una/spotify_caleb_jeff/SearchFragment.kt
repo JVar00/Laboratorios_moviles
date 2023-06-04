@@ -1,5 +1,6 @@
 package cr.ac.una.spotify_caleb_jeff
 
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -63,6 +65,24 @@ class SearchFragment : Fragment() {
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+        }
+
+        //searchField on touch listener
+        searchField.setOnQueryTextFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                println("Hi the history is visible")
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        viewModel.getHistory(requireContext(), "")
+                    }
+                }
+                //load suggestions to searchField in viewModel
+                //historyView.visibility = View.VISIBLE
+            } else {
+                println("Hi the history is gone")
+                //
+                //historyView.visibility = View.GONE
+            }
         }
 
         searchField.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
