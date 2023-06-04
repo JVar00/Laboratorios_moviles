@@ -21,7 +21,8 @@ import cr.ac.una.spotify_caleb_jeff.entity.Track
 
 class SearchAdapter(var tracks: ArrayList<Track>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val VIEW_TYPE_ITEM = 1
+    private val VIEW_TYPE_ITEM = 0
+    //afectara?
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
@@ -49,7 +50,7 @@ class SearchAdapter(var tracks: ArrayList<Track>) :
         val artists = ArrayList<Artist>()
         artists.add(Artist(""))
 
-        if (!newData.isEmpty())
+        if (newData.isEmpty())
             newData.add(0,Track("", Album("", covers), artists, ""))
         notifyDataSetChanged()
     }
