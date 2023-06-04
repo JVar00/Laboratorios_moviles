@@ -5,10 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cr.ac.una.spotify_caleb_jeff.adapter.SearchAdapter
@@ -16,8 +16,8 @@ import cr.ac.una.spotify_caleb_jeff.databinding.FragmentSearchBinding
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.viewmodel.SpotifySearchViewmodel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * A simple [Fragment] subclass.
@@ -65,15 +65,29 @@ class SearchFragment : Fragment() {
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
 
-        //listener to the text field to search for the artist while typing
-
         searchField.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
             override fun onQueryTextSubmit(query: String): Boolean {
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        viewModel.addHistory(requireContext(), query)
+                    }
+                }
                 viewModel.search(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
+
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        viewModel.getHistory(requireContext(), newText)
+                        //el getHistory actualizaria la lista del historial
+                        //hay que hacer un adapter para el historial de busqueda que se muestra y tambien
+                        //un observer para que se actualice la lista conforme escribamos
+                    }
+                }
+                viewModel.search(newText)
                 return false
             }
         })

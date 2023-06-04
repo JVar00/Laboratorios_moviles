@@ -16,4 +16,7 @@ interface HistoryDAO {
 
     @Query("SELECT * FROM History")
     fun getAll(): List<History?>?
+
+    @Query("SELECT * FROM History WHERE song_name LIKE '%' || :song_name || '%'")
+    fun typeHistory(song_name: String): List<History?>?
 }
