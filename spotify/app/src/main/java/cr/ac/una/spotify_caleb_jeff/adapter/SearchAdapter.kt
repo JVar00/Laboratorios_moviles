@@ -45,13 +45,6 @@ class SearchAdapter(var tracks: ArrayList<Track>) :
     }
     fun updateData(newData: ArrayList<Track>) {
         tracks = newData
-        val covers = ArrayList<Cover>()
-        covers.add(Cover(""))
-        val artists = ArrayList<Artist>()
-        artists.add(Artist(""))
-
-        if (newData.isEmpty())
-            newData.add(0,Track("", Album("", covers), artists, ""))
         notifyDataSetChanged()
     }
 

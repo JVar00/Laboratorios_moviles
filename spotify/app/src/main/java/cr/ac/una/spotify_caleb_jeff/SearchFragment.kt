@@ -211,7 +211,14 @@ class SearchFragment : Fragment() {
                         viewModel.getHistory(requireContext(), newText)
                     }
                 }
-                viewModel.search(newText)
+
+                if (newText != "") {
+                    viewModel.search(newText)
+                } else {
+                    //clean the list
+                    adapter.updateData(arrayListOf<Track>())
+                }
+
                 return false
             }
         })
