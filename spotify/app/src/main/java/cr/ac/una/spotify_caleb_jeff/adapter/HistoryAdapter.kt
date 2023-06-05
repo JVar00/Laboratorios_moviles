@@ -49,9 +49,6 @@ class HistoryAdapter(var history: ArrayList<History>, var onItemClick: (String) 
     }
     fun updateData(newData: ArrayList<History>) {
         history = newData
-
-        if (newData.isEmpty())
-            newData.add(0, History(null, ""))
         notifyDataSetChanged()
     }
 

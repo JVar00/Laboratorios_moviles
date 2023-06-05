@@ -188,6 +188,14 @@ class SearchFragment : Fragment() {
                 historyView.visibility = View.VISIBLE
             } else {
                 println("Hi the history is gone")
+                val query = searchField.query.toString()
+                if (query != "") {
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            viewModel.addHistory(requireContext(), query)
+                        }
+                    }
+                }
                 historyView.visibility = View.GONE
             }
         }
@@ -195,11 +203,14 @@ class SearchFragment : Fragment() {
         searchField.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String): Boolean {
+
+
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         viewModel.addHistory(requireContext(), query)
                     }
                 }
+
                 viewModel.search(query)
                 return true
             }
