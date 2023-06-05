@@ -26,6 +26,10 @@ class SpotifySearchViewmodel: ViewModel() {
 
     private var _tracks: MutableLiveData<List<Track>> = MutableLiveData()
     var tracks : LiveData<List<Track>> = _tracks
+
+    private var _history: MutableLiveData<List<History>> = MutableLiveData()
+    var history : LiveData<List<History>> = _history
+
     private lateinit var historyDAO : HistoryDAO
 
     private var _errorMessage: MutableLiveData<String> = MutableLiveData()
@@ -149,13 +153,14 @@ class SpotifySearchViewmodel: ViewModel() {
         historyDAO.insert(History(null, query))
     }
 
-    fun deleteHistoryItem(context: Context){
+    fun deleteHistoryItem(context: Context, entity: History){
         initDatabase(context)
+        historyDAO.delete(entity)
     }
 
     fun getHistory(context: Context, text: String){
         initDatabase(context)
-        println(historyDAO.typeHistory(text))
+        _history.postValue(historyDAO.typeHistory(text))
     }
 
     private fun initDatabase(context: Context) {
