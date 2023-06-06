@@ -49,4 +49,5 @@
     <string name="sample_artist_name">sample_artist_name</string>
     <string name="song_image">song_image</string>
     <string name="options_menu">options_menu</string>
+    <string name="options">options</string>
 </resources>

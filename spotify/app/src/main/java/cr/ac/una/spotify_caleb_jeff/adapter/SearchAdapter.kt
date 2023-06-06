@@ -19,7 +19,7 @@ import cr.ac.una.spotify_caleb_jeff.entity.Artist
 import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 
-class SearchAdapter(var tracks: ArrayList<Track>) :
+class SearchAdapter(var tracks: ArrayList<Track>, var onItemClick: (Track) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     //afectara?
@@ -36,7 +36,10 @@ class SearchAdapter(var tracks: ArrayList<Track>) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
        if (holder is ViewHolder) {
-            holder.bind(tracks[position])
+           holder.bind(tracks[position])
+           holder.itemView.setOnClickListener {
+               onItemClick(tracks[position])
+           }
        }
     }
 

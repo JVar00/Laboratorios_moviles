@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -66,7 +68,9 @@ class SearchFragment : Fragment() {
         val listView = view.findViewById<RecyclerView>(R.id.list_view)
         val historyView = view.findViewById<RecyclerView>(R.id.history_view)
 
-        val adapter = SearchAdapter(tracks as ArrayList<Track>)
+        val adapter = SearchAdapter(tracks as ArrayList<Track>){ selectedItem ->
+            //
+        }
         val historyAdapter = HistoryAdapter(history as ArrayList<History>) { selectedItem ->
             searchField.setQuery(selectedItem, false)
         }
@@ -92,6 +96,37 @@ class SearchFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
+
+        //val menuButton = view.findViewById<ImageButton>(R.id.options_button)
+
+        /*
+        menuButton.setOnClickListener {
+            // Create a PopupMenu
+            val popupMenu = PopupMenu(context, menuButton)
+            popupMenu.inflate(R.menu.popup_menu)
+
+            // Set click listener for menu items
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_view_album -> {
+                        // Handle "View Album" action
+                        Toast.makeText(context, "View Album", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.menu_view_artist -> {
+                        // Handle "View Artist" action
+                        Toast.makeText(context, "View Artist", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            // Show the popup menu
+            popupMenu.show()
+        }
+
+         */
 
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
@@ -188,6 +223,7 @@ class SearchFragment : Fragment() {
                 historyView.visibility = View.VISIBLE
             } else {
                 println("Hi the history is gone")
+                /*
                 val query = searchField.query.toString()
                 if (query != "") {
                     lifecycleScope.launch {
@@ -196,6 +232,7 @@ class SearchFragment : Fragment() {
                         }
                     }
                 }
+                */
                 historyView.visibility = View.GONE
             }
         }
