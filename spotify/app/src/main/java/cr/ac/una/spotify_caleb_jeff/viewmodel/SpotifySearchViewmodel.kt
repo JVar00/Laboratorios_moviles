@@ -110,7 +110,8 @@ class SpotifySearchViewmodel: ViewModel() {
                                                 track.name,
                                                 Album(albumId, albumName, cover),
                                                 artists,
-                                                track.uri
+                                                track.uri,
+                                                track.popularity
                                             )
 
                                             trackList.add(trackObject)

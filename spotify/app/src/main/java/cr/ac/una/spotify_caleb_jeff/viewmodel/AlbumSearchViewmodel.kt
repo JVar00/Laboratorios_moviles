@@ -96,7 +96,8 @@ class AlbumSearchViewmodel: ViewModel() {
                                                     track.name,
                                                     Album("", albumName, cover),
                                                     artists,
-                                                    track.uri
+                                                    track.uri,
+                                                    track.popularity
                                                 )
 
                                                 trackList.add(trackObject)

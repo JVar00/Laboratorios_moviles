@@ -72,16 +72,17 @@ class ArtistSearchViewmodel: ViewModel() {
                     if (accessToken != null) {
 
                         val searchRequest = spotifyService.searchTopTracks("Bearer $accessToken", query)
-                        searchRequest.enqueue(object : Callback<TrackResponse> {
-                            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+                        searchRequest.enqueue(object : Callback<ArtistResponse> {
+                            override fun onResponse(call: Call<ArtistResponse>, response: Response<ArtistResponse>) {
+                                println(call)
                                 if (response.isSuccessful) {
                                     val trackResponse = response.body()
                                     val trackList = mutableListOf<Track>()
 
                                     println(trackResponse)
 
-                                    if (trackResponse != null && trackResponse.tracks.items.isNotEmpty()) {
-                                        for (track in trackResponse.tracks.items){
+                                    if (trackResponse != null && trackResponse.tracks.isNotEmpty()) {
+                                        for (track in trackResponse.tracks){
 
                                             // Create a Track object and populate its properties
                                             val album = track.album
@@ -98,7 +99,8 @@ class ArtistSearchViewmodel: ViewModel() {
                                                 track.name,
                                                 Album(albumId, albumName, cover),
                                                 artists,
-                                                track.uri
+                                                track.uri,
+                                                track.popularity
                                             )
 
                                             trackList.add(trackObject)
@@ -115,7 +117,7 @@ class ArtistSearchViewmodel: ViewModel() {
                                 }
                             }
 
-                            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                            override fun onFailure(call: Call<ArtistResponse>, t: Throwable) {
                                 println(t)
                                 displayErrorMessage(t.message ?: "Error en la solicitud de búsqueda.")
                             }

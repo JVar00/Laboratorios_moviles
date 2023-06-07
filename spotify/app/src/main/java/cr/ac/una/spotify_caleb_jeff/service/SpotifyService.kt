@@ -31,6 +31,6 @@ interface SpotifyService {
     fun searchTopTracks(
         @Header("Authorization") authorization: String,
         @Path("id") artistId: String,
-    ): Call<TrackResponse>
+    ): Call<ArtistResponse>
 
 }

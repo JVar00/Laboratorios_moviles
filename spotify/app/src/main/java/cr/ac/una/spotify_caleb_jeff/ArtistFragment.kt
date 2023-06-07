@@ -27,6 +27,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import cr.ac.una.spotify_caleb_jeff.adapter.HistoryAdapter
 import cr.ac.una.spotify_caleb_jeff.adapter.SearchAdapter
+import cr.ac.una.spotify_caleb_jeff.adapter.TopTracksAdapter
 import cr.ac.una.spotify_caleb_jeff.entity.History
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.viewmodel.ArtistSearchViewmodel
@@ -79,7 +80,7 @@ class ArtistFragment : Fragment() {
 
         val viewModel = ViewModelProvider(this).get(ArtistSearchViewmodel::class.java)
         val listView = view.findViewById<RecyclerView>(R.id.list_view_top)
-        val adapter = SearchAdapter(tracks as ArrayList<Track>, requireContext()) { selectedItem ->
+        val adapter = TopTracksAdapter(tracks as ArrayList<Track>, requireContext()) { selectedItem ->
             //
         }
 
