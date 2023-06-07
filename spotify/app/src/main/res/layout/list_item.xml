@@ -55,7 +55,7 @@
         android:id="@+id/options_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_launcher_background"
+        android:src="@drawable/ic_menu"
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/options" />
 

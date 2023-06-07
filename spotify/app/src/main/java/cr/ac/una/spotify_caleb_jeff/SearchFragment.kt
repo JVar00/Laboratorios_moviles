@@ -14,9 +14,12 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +39,7 @@ import kotlinx.coroutines.withContext
  * Use the [SearchFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), SearchAdapter.OnItemClickListener {
 
     private var _binding: FragmentSearchBinding? = null
     private lateinit var tracks: List<Track>
@@ -56,6 +59,21 @@ class SearchFragment : Fragment() {
 
     }
 
+    override fun onViewAlbumClicked(track: Track) {
+        //val albumFragment = AlbumFragment.newInstance(track.album.name)
+        val bundle = Bundle()
+        bundle.putString("album", track.album.id)
+        findNavController().navigate(R.id.action_searchFragment_to_AlbumFragment, bundle)
+    }
+
+    override fun onViewArtistClicked(track: Track) {
+        val bundle = Bundle()
+        bundle.putString("artist", track.artists[0].id)
+        bundle.putString("artist_url", track.artists[0].images[0].url)
+        bundle.putString("artist_name", track.artists[0].name)
+        findNavController().navigate(R.id.action_searchFragment_to_ArtistFragment, bundle)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,9 +86,12 @@ class SearchFragment : Fragment() {
         val listView = view.findViewById<RecyclerView>(R.id.list_view)
         val historyView = view.findViewById<RecyclerView>(R.id.history_view)
 
-        val adapter = SearchAdapter(tracks as ArrayList<Track>){ selectedItem ->
+        val adapter = SearchAdapter(tracks as ArrayList<Track>, requireContext()) { selectedItem ->
             //
         }
+
+        adapter.onItemClickListener = this
+
         val historyAdapter = HistoryAdapter(history as ArrayList<History>) { selectedItem ->
             searchField.setQuery(selectedItem, false)
         }
@@ -102,28 +123,7 @@ class SearchFragment : Fragment() {
         /*
         menuButton.setOnClickListener {
             // Create a PopupMenu
-            val popupMenu = PopupMenu(context, menuButton)
-            popupMenu.inflate(R.menu.popup_menu)
 
-            // Set click listener for menu items
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.menu_view_album -> {
-                        // Handle "View Album" action
-                        Toast.makeText(context, "View Album", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    R.id.menu_view_artist -> {
-                        // Handle "View Artist" action
-                        Toast.makeText(context, "View Artist", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    else -> false
-                }
-            }
-
-            // Show the popup menu
-            popupMenu.show()
         }
 
          */
@@ -273,7 +273,7 @@ class SearchFragment : Fragment() {
 
         /*
         binding.buttonSecond.setOnClickListener {
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+
         }*/
 
     }
@@ -282,4 +282,6 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 }

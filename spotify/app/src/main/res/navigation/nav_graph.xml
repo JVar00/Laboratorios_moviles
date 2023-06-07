@@ -23,5 +23,31 @@
         <action
             android:id="@+id/action_searchFragment_to_SecondFragment"
             app:destination="@id/TrackFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_AlbumFragment"
+            app:destination="@id/AlbumFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_ArtistFragment"
+            app:destination="@id/ArtistFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/AlbumFragment"
+        android:name="cr.ac.una.spotify_caleb_jeff.AlbumFragment"
+        android:label="@string/album_fragment_label"
+        tools:layout="@layout/fragment_album">
+
+        <action
+            android:id="@+id/action_AlbumFragment_to_FirstFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ArtistFragment"
+        android:name="cr.ac.una.spotify_caleb_jeff.ArtistFragment"
+        android:label="@string/artist_fragment_label"
+        tools:layout="@layout/fragment_artist">
+
+        <action
+            android:id="@+id/action_ArtistFragment_to_FirstFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
 </navigation>

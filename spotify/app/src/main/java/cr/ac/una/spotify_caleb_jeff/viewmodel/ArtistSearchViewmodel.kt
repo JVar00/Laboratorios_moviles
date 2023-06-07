@@ -1,19 +1,15 @@
 package cr.ac.una.spotify_caleb_jeff.viewmodel
 
-import android.content.Context
 import android.util.Base64
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import cr.ac.una.spotify_caleb_jeff.DAO.HistoryDAO
-import cr.ac.una.spotify_caleb_jeff.db.AppDatabase
+
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.entity.AccessTokenResponse
 import cr.ac.una.spotify_caleb_jeff.entity.Album
 import cr.ac.una.spotify_caleb_jeff.entity.AlbumResponse
-import cr.ac.una.spotify_caleb_jeff.entity.Artist
 import cr.ac.una.spotify_caleb_jeff.entity.Cover
-import cr.ac.una.spotify_caleb_jeff.entity.History
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
 import cr.ac.una.spotify_caleb_jeff.service.SpotifyService
 
@@ -23,22 +19,15 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class SpotifySearchViewmodel: ViewModel() {
+class ArtistSearchViewmodel: ViewModel() {
 
     private var _tracks: MutableLiveData<List<Track>> = MutableLiveData()
     var tracks : LiveData<List<Track>> = _tracks
 
-    private var _history: MutableLiveData<List<History>> = MutableLiveData()
-    var history : LiveData<List<History>> = _history
-
-    private lateinit var historyDAO : HistoryDAO
-
     private var _errorMessage: MutableLiveData<String> = MutableLiveData()
     var errorMessage: LiveData<String> = _errorMessage
 
-    private var albumURL = ""
-
-   private fun displayErrorMessage(message: String) {
+    private fun displayErrorMessage(message: String) {
         _errorMessage.value = message
     }
 
@@ -70,7 +59,7 @@ class SpotifySearchViewmodel: ViewModel() {
         )
     }
 
-   fun search(query: String){
+    fun search(query: String){
 
         val tokenRequest = getAccessToken()
         tokenRequest.enqueue(object : Callback<AccessTokenResponse> {
@@ -81,17 +70,14 @@ class SpotifySearchViewmodel: ViewModel() {
 
                     if (accessToken != null) {
 
-                        val searchRequest = spotifyService.searchTrack("Bearer $accessToken", query)
+                        val searchRequest = spotifyService.searchTopTracks("Bearer $accessToken", query)
                         searchRequest.enqueue(object : Callback<TrackResponse> {
                             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
                                 if (response.isSuccessful) {
                                     val trackResponse = response.body()
                                     val trackList = mutableListOf<Track>()
 
-                                    //println(trackResponse)
-
                                     if (trackResponse != null && trackResponse.tracks.items.isNotEmpty()) {
-
                                         for (track in trackResponse.tracks.items){
 
                                             // Create a Track object and populate its properties
@@ -113,9 +99,6 @@ class SpotifySearchViewmodel: ViewModel() {
                                             )
 
                                             trackList.add(trackObject)
-
-                                            //println("Track: " + track.name)
-
                                         }
                                         _tracks.postValue(trackList)
 
@@ -149,34 +132,4 @@ class SpotifySearchViewmodel: ViewModel() {
         })
     }
 
-    fun addHistory(context: Context, query: String) {
-        initDatabase(context)
-        historyDAO.insert(History(null, query))
-    }
-
-    fun deleteHistoryItem(context: Context, entity: History){
-        initDatabase(context)
-        historyDAO.delete(entity)
-    }
-
-    fun getHistory(context: Context, text: String){
-        initDatabase(context)
-        _history.postValue(historyDAO.typeHistory(text))
-    }
-
-    private fun initDatabase(context: Context) {
-        historyDAO = AppDatabase.getInstance(context).historyDao()
-    }
-
 }
-
-/*
-
-    private fun displayTrackInfo(trackName: String, artistName: String) {
-        val message = "Canción encontrada: $trackName - $artistName"
-
-    }
-
-
-
- */

@@ -7,7 +7,6 @@
     tools:context=".SearchFragment"
     android:orientation="vertical">
 
-    <!-- Add a search bar with an icon -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
@@ -32,9 +31,17 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:nestedScrollingEnabled="false"
         android:layout_marginHorizontal="16dp"
         />
+
+    <!-- Add the additional view below the RecyclerView -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/black"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

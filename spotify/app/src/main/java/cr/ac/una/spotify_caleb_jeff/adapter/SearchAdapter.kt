@@ -4,9 +4,13 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -19,10 +23,18 @@ import cr.ac.una.spotify_caleb_jeff.entity.Artist
 import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.Track
 
-class SearchAdapter(var tracks: ArrayList<Track>, var onItemClick: (Track) -> Unit) :
+class SearchAdapter(var tracks: ArrayList<Track>, var context: android.content.Context,
+                    var onItemClick: (Track) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
     //afectara?
+
+    interface OnItemClickListener {
+        fun onViewAlbumClicked(track: Track)
+        fun onViewArtistClicked(track: Track)
+    }
+
+    var onItemClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
@@ -39,6 +51,30 @@ class SearchAdapter(var tracks: ArrayList<Track>, var onItemClick: (Track) -> Un
            holder.bind(tracks[position])
            holder.itemView.setOnClickListener {
                onItemClick(tracks[position])
+           }
+           holder.options.setOnClickListener {
+               onItemClickListener?.let { listener ->
+                   val popupMenu = PopupMenu(context, holder.options)
+                   popupMenu.inflate(R.menu.popup_menu)
+
+                   // Set click listener for menu items
+                   popupMenu.setOnMenuItemClickListener { item ->
+                       when (item.itemId) {
+                           R.id.menu_view_album -> {
+                               listener.onViewAlbumClicked(tracks[position])
+                               true
+                           }
+                           R.id.menu_view_artist -> {
+                               listener.onViewArtistClicked(tracks[position])
+                               true
+                           }
+                           else -> false
+                       }
+                   }
+
+                   // Show the popup menu
+                   popupMenu.show()
+               }
            }
        }
     }
@@ -58,17 +94,26 @@ class SearchAdapter(var tracks: ArrayList<Track>, var onItemClick: (Track) -> Un
         val artistName_View = itemView.findViewById<TextView>(R.id.artist_name)
         val loadingWheel = itemView.findViewById<ProgressBar>(R.id.loading_progress)
 
+        val options = itemView.findViewById<ImageButton>(R.id.options_button)
+
         fun bind(track: Track) {
 
             loadingWheel.visibility = View.VISIBLE
 
             val trackName = track.name
-            val artistName = track.artists[0].name
             val albumImageURL = track.album.images[0].url
             val albumName = track.album.name
 
             trackName_View.text = trackName
-            artistName_View.text = artistName
+
+            val artistsBuilder = StringBuilder()
+            for ((index, _artist) in track.artists.withIndex()) {
+                artistsBuilder.append(_artist.name)
+                if (index < track.artists.size - 1) {
+                    artistsBuilder.append(", ")
+                }
+            }
+            artistName_View.text = artistsBuilder.toString()
 
             Glide.with(itemView).load(albumImageURL).listener(object: RequestListener<Drawable> {
 
