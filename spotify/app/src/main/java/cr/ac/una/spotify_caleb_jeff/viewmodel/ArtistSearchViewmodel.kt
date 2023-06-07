@@ -72,11 +72,13 @@ class ArtistSearchViewmodel: ViewModel() {
                     if (accessToken != null) {
 
                         val searchRequest = spotifyService.searchTopTracks("Bearer $accessToken", query)
-                        searchRequest.enqueue(object : Callback<ArtistResponse> {
-                            override fun onResponse(call: Call<ArtistResponse>, response: Response<ArtistResponse>) {
+                        searchRequest.enqueue(object : Callback<TrackResponse> {
+                            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
                                 if (response.isSuccessful) {
                                     val trackResponse = response.body()
                                     val trackList = mutableListOf<Track>()
+
+                                    println(trackResponse)
 
                                     if (trackResponse != null && trackResponse.tracks.items.isNotEmpty()) {
                                         for (track in trackResponse.tracks.items){
@@ -113,7 +115,7 @@ class ArtistSearchViewmodel: ViewModel() {
                                 }
                             }
 
-                            override fun onFailure(call: Call<ArtistResponse>, t: Throwable) {
+                            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                                 println(t)
                                 displayErrorMessage(t.message ?: "Error en la solicitud de búsqueda.")
                             }

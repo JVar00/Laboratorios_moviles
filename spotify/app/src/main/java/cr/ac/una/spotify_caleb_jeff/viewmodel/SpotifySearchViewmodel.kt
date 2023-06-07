@@ -97,6 +97,7 @@ class SpotifySearchViewmodel: ViewModel() {
                                             // Create a Track object and populate its properties
                                             val album = track.album
                                             val artists = track.artists
+                                            println(artists)
 
                                             val albumName = album.name
                                             val imageUrl = album.images[0].url
