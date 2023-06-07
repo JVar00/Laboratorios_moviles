@@ -27,7 +27,7 @@
             android:layout_margin="16dp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:textSize="32sp" />
 
         <ProgressBar
             android:id="@+id/loading_progress"
@@ -41,7 +41,7 @@
         android:id="@+id/text_top"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TOP 10 SONGS"
+        android:text="TOP SONGS"
         android:textSize="25sp"
         android:textStyle="bold"
         android:layout_marginStart="30dp"

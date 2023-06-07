@@ -68,8 +68,9 @@ class SearchFragment : Fragment(), SearchAdapter.OnItemClickListener {
 
     override fun onViewArtistClicked(track: Track) {
         val bundle = Bundle()
+        println(track.artists)
         bundle.putString("artist", track.artists[0].id)
-        bundle.putString("artist_url", track.artists[0].images[0].url)
+        bundle.putString("artist_url", "https://i.scdn.co/image/ab67616d0000b273e55be22cd0085496fee07b29")
         bundle.putString("artist_name", track.artists[0].name)
         findNavController().navigate(R.id.action_searchFragment_to_ArtistFragment, bundle)
     }

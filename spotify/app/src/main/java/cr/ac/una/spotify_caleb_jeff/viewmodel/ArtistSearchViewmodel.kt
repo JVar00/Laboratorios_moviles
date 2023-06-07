@@ -9,6 +9,7 @@ import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.entity.AccessTokenResponse
 import cr.ac.una.spotify_caleb_jeff.entity.Album
 import cr.ac.una.spotify_caleb_jeff.entity.AlbumResponse
+import cr.ac.una.spotify_caleb_jeff.entity.ArtistResponse
 import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
 import cr.ac.una.spotify_caleb_jeff.service.SpotifyService
@@ -71,8 +72,8 @@ class ArtistSearchViewmodel: ViewModel() {
                     if (accessToken != null) {
 
                         val searchRequest = spotifyService.searchTopTracks("Bearer $accessToken", query)
-                        searchRequest.enqueue(object : Callback<TrackResponse> {
-                            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+                        searchRequest.enqueue(object : Callback<ArtistResponse> {
+                            override fun onResponse(call: Call<ArtistResponse>, response: Response<ArtistResponse>) {
                                 if (response.isSuccessful) {
                                     val trackResponse = response.body()
                                     val trackList = mutableListOf<Track>()
@@ -112,7 +113,7 @@ class ArtistSearchViewmodel: ViewModel() {
                                 }
                             }
 
-                            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                            override fun onFailure(call: Call<ArtistResponse>, t: Throwable) {
                                 println(t)
                                 displayErrorMessage(t.message ?: "Error en la solicitud de búsqueda.")
                             }
