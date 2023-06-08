@@ -9,6 +9,7 @@ import cr.ac.una.spotify_caleb_jeff.entity.Track
 import cr.ac.una.spotify_caleb_jeff.entity.AccessTokenResponse
 import cr.ac.una.spotify_caleb_jeff.entity.Album
 import cr.ac.una.spotify_caleb_jeff.entity.AlbumResponse
+import cr.ac.una.spotify_caleb_jeff.entity.Artist
 import cr.ac.una.spotify_caleb_jeff.entity.ArtistResponse
 import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
@@ -21,6 +22,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class ArtistSearchViewmodel: ViewModel() {
+
+    private var _artistImageUrl: MutableLiveData<String> = MutableLiveData()
+    val artistImage: LiveData<String> = _artistImageUrl
 
     private var _tracks: MutableLiveData<List<Track>> = MutableLiveData()
     var tracks : LiveData<List<Track>> = _tracks
@@ -58,6 +62,54 @@ class ArtistSearchViewmodel: ViewModel() {
             "Basic $base64Auth",
             "client_credentials"
         )
+    }
+
+    fun getArtist(id: String){
+
+        val tokenRequest = getAccessToken()
+        tokenRequest.enqueue(object : Callback<AccessTokenResponse> {
+            override fun onResponse(call: Call<AccessTokenResponse>, response: Response<AccessTokenResponse>) {
+                if (response.isSuccessful) {
+                    val accessTokenResponse = response.body()
+                    val accessToken = accessTokenResponse?.accessToken
+
+                    if (accessToken != null) {
+
+                        val artistRequest = spotifyService.getArtist("Bearer $accessToken", id)
+                        artistRequest.enqueue(object : Callback<Artist> {
+                            override fun onResponse(call: Call<Artist>, response: Response<Artist>) {
+                                if (response.isSuccessful) {
+                                    val artistResponse = response.body()
+
+                                    // Aquí tendrías la url de la imagen del artista
+                                    val imageUrl = artistResponse?.images?.get(0)?.url
+
+                                    // Actualiza el valor de artistImageUrl
+                                    _artistImageUrl.postValue(imageUrl ?: "")
+                                } else {
+                                    System.out.println("Mensaje:    "+response.raw())
+                                    displayErrorMessage("Error en la respuesta del servidor.")
+                                }
+                            }
+
+                            override fun onFailure(call: Call<Artist>, t: Throwable) {
+                                println(t)
+                                displayErrorMessage(t.message ?: "Error en la solicitud del artista.")
+                            }
+                        })
+                    } else {
+                        displayErrorMessage("Error al obtener el accessToken.")
+                    }
+                } else {
+                    System.out.println("Mensaje:    "+response.raw())
+                    displayErrorMessage("Error en la respuesta del servidor.")
+                }
+            }
+
+            override fun onFailure(call: Call<AccessTokenResponse>, t: Throwable) {
+                displayErrorMessage("Error en la solicitud de accessToken.")
+            }
+        })
     }
 
     fun search(query: String){

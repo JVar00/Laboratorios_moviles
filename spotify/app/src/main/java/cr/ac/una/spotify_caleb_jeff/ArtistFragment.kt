@@ -97,17 +97,17 @@ class ArtistFragment : Fragment() {
         }
 
         artistId?.let {
-            viewModel.search(it) }
+            viewModel.search(it)
+            viewModel.getArtist(it)
+        }
 
         val cover = view.findViewById<ImageView>(R.id.image_album)
         val artist = view.findViewById<TextView>(R.id.text_artist_name)
         val progressBar = view.findViewById<ProgressBar>(R.id.loading_progress)
 
-        artistName?.let { artist.text = it }
-
-        artistUrl?.let {
-
-            Glide.with(view).load(artistUrl).listener(object: RequestListener<Drawable> {
+        viewModel.artistImage.observe(viewLifecycleOwner) { imageURL ->
+            println(imageURL)
+            Glide.with(view).load(imageURL).listener(object: RequestListener<Drawable> {
 
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -128,6 +128,10 @@ class ArtistFragment : Fragment() {
 
             artistName?.let { cover.contentDescription = artistName }
         }
+
+
+
+        artistName?.let { artist.text = it }
 
     }
 

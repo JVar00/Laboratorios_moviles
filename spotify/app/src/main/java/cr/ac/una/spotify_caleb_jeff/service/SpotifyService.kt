@@ -2,6 +2,7 @@ package cr.ac.una.spotify_caleb_jeff.service
 
 import cr.ac.una.spotify_caleb_jeff.entity.AccessTokenResponse
 import cr.ac.una.spotify_caleb_jeff.entity.AlbumResponse
+import cr.ac.una.spotify_caleb_jeff.entity.Artist
 import cr.ac.una.spotify_caleb_jeff.entity.ArtistResponse
 import cr.ac.una.spotify_caleb_jeff.entity.TrackResponse
 import retrofit2.Call
@@ -32,5 +33,11 @@ interface SpotifyService {
         @Header("Authorization") authorization: String,
         @Path("id") artistId: String,
     ): Call<ArtistResponse>
+
+    @GET("v1/artists/{id}")
+    fun getArtist(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String
+    ): Call<Artist>
 
 }
