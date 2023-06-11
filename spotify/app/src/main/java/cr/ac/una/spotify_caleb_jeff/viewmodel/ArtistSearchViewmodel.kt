@@ -142,6 +142,13 @@ class ArtistSearchViewmodel: ViewModel() {
                                             val imageUrl = album.images[0].url
                                             val albumId = album.id
 
+                                            var previewURL = track.preview_url
+
+                                            if(previewURL == null){
+                                                previewURL = ""
+                                                displayErrorMessage("Algunas canciones no tienen demos")
+                                            }
+
                                             val cover = ArrayList<Cover>()
                                             cover.add(Cover(imageUrl))
 
@@ -151,7 +158,7 @@ class ArtistSearchViewmodel: ViewModel() {
                                                 Album(albumId, albumName, cover),
                                                 artists,
                                                 track.uri,
-                                                track.preview_url,
+                                                previewURL,
                                                 track.popularity
                                             )
 
