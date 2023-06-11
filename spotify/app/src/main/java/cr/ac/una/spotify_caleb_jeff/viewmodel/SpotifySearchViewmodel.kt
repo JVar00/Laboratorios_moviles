@@ -22,6 +22,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Date
 
 class SpotifySearchViewmodel: ViewModel() {
 
@@ -153,7 +154,8 @@ class SpotifySearchViewmodel: ViewModel() {
 
     fun addHistory(context: Context, query: String) {
         initDatabase(context)
-        historyDAO.insert(History(null, query))
+        val currentDate = Date()
+        historyDAO.insert(History(null, query, currentDate))
     }
 
     fun deleteHistoryItem(context: Context, entity: History){

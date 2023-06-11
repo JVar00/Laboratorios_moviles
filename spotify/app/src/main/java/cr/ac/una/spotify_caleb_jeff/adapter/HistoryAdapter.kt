@@ -1,24 +1,14 @@
 package cr.ac.una.spotify_caleb_jeff.adapter
 
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import cr.ac.una.spotify_caleb_jeff.R
-import cr.ac.una.spotify_caleb_jeff.entity.Album
-import cr.ac.una.spotify_caleb_jeff.entity.Artist
-import cr.ac.una.spotify_caleb_jeff.entity.Cover
 import cr.ac.una.spotify_caleb_jeff.entity.History
-import cr.ac.una.spotify_caleb_jeff.entity.Track
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 class HistoryAdapter(var history: ArrayList<History>, var onItemClick: (String) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -54,12 +44,18 @@ class HistoryAdapter(var history: ArrayList<History>, var onItemClick: (String) 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val trackName_View = itemView.findViewById<TextView>(R.id.history_text)
+        val trackNameView = itemView.findViewById<TextView>(R.id.history_text)
+        val trackDateView = itemView.findViewById<TextView>(R.id.history_date)
+
 
         fun bind(track: History) {
 
             val trackName = track.song_name
-            trackName_View.text = trackName
+            val trackDate = track.date
+            val formatter = SimpleDateFormat("yyyy-MM-dd")
+
+            trackNameView.text = trackName
+            trackDateView.text = formatter.format(trackDate)
 
         }
     }
