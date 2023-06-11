@@ -131,8 +131,6 @@ class ArtistSearchViewmodel: ViewModel() {
                                     val trackResponse = response.body()
                                     val trackList = mutableListOf<Track>()
 
-                                    println(trackResponse)
-
                                     if (trackResponse != null && trackResponse.tracks.isNotEmpty()) {
                                         for (track in trackResponse.tracks){
 
@@ -148,10 +146,12 @@ class ArtistSearchViewmodel: ViewModel() {
                                             cover.add(Cover(imageUrl))
 
                                             val trackObject = Track(
+                                                track.id,
                                                 track.name,
                                                 Album(albumId, albumName, cover),
                                                 artists,
                                                 track.uri,
+                                                track.preview_url,
                                                 track.popularity
                                             )
 

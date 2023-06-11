@@ -27,6 +27,8 @@ class SearchAdapter(var tracks: ArrayList<Track>, var context: android.content.C
                     var onItemClick: (Track) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val VIEW_TYPE_ITEM = 0
+
+
     //afectara?
 
     interface OnItemClickListener {
@@ -47,11 +49,36 @@ class SearchAdapter(var tracks: ArrayList<Track>, var context: android.content.C
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-       if (holder is ViewHolder) {
+
+        var isPlaying = false
+
+        if (holder is ViewHolder) {
+
+            fun startSong() {
+                // Start playing the demo track from Spotify API
+                // Update the state and UI accordingly
+                isPlaying = true
+                holder.playPauseButton.setImageResource(R.drawable.ic_pause_white)
+            }
+
+            fun pauseSong() {
+                // Pause the currently playing demo track from Spotify API
+                // Update the state and UI accordingly
+                isPlaying = false
+                holder.playPauseButton.setImageResource(R.drawable.ic_play_white)
+            }
+
            holder.bind(tracks[position])
+
            holder.itemView.setOnClickListener {
                onItemClick(tracks[position])
+               if (isPlaying) {
+                   pauseSong()
+               } else {
+                   startSong()
+               }
            }
+
            holder.options.setOnClickListener {
                onItemClickListener?.let { listener ->
                    val popupMenu = PopupMenu(context, holder.options)
@@ -76,7 +103,18 @@ class SearchAdapter(var tracks: ArrayList<Track>, var context: android.content.C
                    popupMenu.show()
                }
            }
+
+            // Set the initial state based on whether the track is currently playing
+            if (isPlaying) {
+                holder.playPauseButton.setImageResource(R.drawable.ic_pause_white)
+            } else {
+                holder.playPauseButton.setImageResource(R.drawable.ic_play_white)
+            }
+            holder.playPauseButton.visibility = View.VISIBLE
+
        }
+
+
     }
 
     override fun getItemCount(): Int {
@@ -95,6 +133,7 @@ class SearchAdapter(var tracks: ArrayList<Track>, var context: android.content.C
         val loadingWheel = itemView.findViewById<ProgressBar>(R.id.loading_progress)
 
         val options = itemView.findViewById<ImageButton>(R.id.options_button)
+        val playPauseButton = itemView.findViewById<ImageButton>(R.id.play_pause_button)
 
         fun bind(track: Track) {
 

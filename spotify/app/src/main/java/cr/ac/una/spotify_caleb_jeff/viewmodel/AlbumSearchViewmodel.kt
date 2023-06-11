@@ -93,10 +93,12 @@ class AlbumSearchViewmodel: ViewModel() {
                                                 cover.add(Cover(albumURL))
 
                                                 val trackObject = Track(
+                                                    track.id,
                                                     track.name,
                                                     Album("", albumName, cover),
                                                     artists,
                                                     track.uri,
+                                                    track.preview_url,
                                                     track.popularity
                                                 )
 

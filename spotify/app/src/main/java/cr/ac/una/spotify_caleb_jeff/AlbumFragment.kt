@@ -1,6 +1,8 @@
 package cr.ac.una.spotify_caleb_jeff
 
 import android.graphics.drawable.Drawable
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -38,6 +40,17 @@ class AlbumFragment : Fragment() {
     private var album: String? = null
     private lateinit var tracks: List<Track>
 
+    private val mediaPlayer = MediaPlayer()
+    private var isPlaying = false
+
+    private fun stopMusic() {
+        if (isPlaying) {
+            mediaPlayer.stop()
+            mediaPlayer.reset()
+            isPlaying = false
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -58,11 +71,42 @@ class AlbumFragment : Fragment() {
 
         tracks = mutableListOf<Track>()
 
+        // Create a new instance of MediaPlayer
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+        mediaPlayer.setAudioAttributes(audioAttributes)
+
         val viewModel = ViewModelProvider(this).get(AlbumSearchViewmodel::class.java)
 
         val listView = view.findViewById<RecyclerView>(R.id.recycler_songs)
         val adapter = SearchAdapter(tracks as ArrayList<Track>, requireContext()) { selectedItem ->
-            //
+
+            val previewUrl = selectedItem.preview_url
+
+            // Set a listener for when the media player is prepared
+            if (isPlaying) {
+                // Stop playing the demo
+                mediaPlayer.stop()
+                mediaPlayer.reset()
+                isPlaying = false
+
+            }else{
+
+                // Set the data source to the previewUrl
+                mediaPlayer.setDataSource(previewUrl)
+
+                // Prepare the media player asynchronously
+                mediaPlayer.prepareAsync()
+
+                mediaPlayer.setOnPreparedListener {
+                    // Start playing the demo
+                    isPlaying = true
+                    mediaPlayer.start()
+                }
+            }
+
         }
 
         listView.adapter = adapter
@@ -140,4 +184,10 @@ class AlbumFragment : Fragment() {
         }
 
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopMusic()
+    }
+
 }
