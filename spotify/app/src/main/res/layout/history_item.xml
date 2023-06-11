@@ -13,4 +13,23 @@
         android:textSize="16sp"
         android:textColor="@android:color/white" />
 
+    <TextView
+        android:id="@+id/history_space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="  |  "
+        android:textSize="16sp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/history_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/white" />
+
+
+
 </LinearLayout>
