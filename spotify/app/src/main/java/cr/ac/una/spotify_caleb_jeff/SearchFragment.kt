@@ -120,16 +120,20 @@ class SearchFragment : Fragment(), SearchAdapter.OnItemClickListener {
 
             }else{
 
-                // Set the data source to the previewUrl
-                mediaPlayer.setDataSource(previewUrl)
+                if(previewUrl.isNotEmpty()){
+                    // Set the data source to the previewUrl
+                    mediaPlayer.setDataSource(previewUrl)
 
-                // Prepare the media player asynchronously
-                mediaPlayer.prepareAsync()
+                    // Prepare the media player asynchronously
+                    mediaPlayer.prepareAsync()
 
-                mediaPlayer.setOnPreparedListener {
-                    // Start playing the demo
-                    isPlaying = true
-                    mediaPlayer.start()
+                    mediaPlayer.setOnPreparedListener {
+                        // Start playing the demo
+                        isPlaying = true
+                        mediaPlayer.start()
+                    }
+                }else{
+                    Toast.makeText(requireContext(), "Esta cancion no tiene demo", Toast.LENGTH_SHORT).show()
                 }
             }
 

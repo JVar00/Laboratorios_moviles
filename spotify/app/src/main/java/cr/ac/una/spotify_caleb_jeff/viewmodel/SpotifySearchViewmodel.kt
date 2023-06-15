@@ -107,13 +107,20 @@ class SpotifySearchViewmodel: ViewModel() {
                                             val cover = ArrayList<Cover>()
                                             cover.add(Cover(imageUrl))
 
+                                            var previewURL = track.preview_url
+
+                                            if(previewURL == null){
+                                                previewURL = ""
+                                                displayErrorMessage("Algunas canciones no tienen demos")
+                                            }
+
                                             val trackObject = Track(
                                                 track.id,
                                                 track.name,
                                                 Album(albumId, albumName, cover),
                                                 artists,
                                                 track.uri,
-                                                track.preview_url,
+                                                previewURL,
                                                 track.popularity
                                             )
 
